@@ -242,6 +242,18 @@ function receiptEntry(vs){
  });
  return h+(vs[0].prepaid?"<hr>"+(()=>{const inv=S.invoices.find(x=>x.id===vs[0].invoiceId);return inv?rw(t("paidTag")+" • "+t("rcptNo")+" "+inv.no,money(inv.total),true):""})():"")+'<hr><div class="c">'+t("rcptFoot")+"</div>";
 }
+function receiptExitGroup(vs,inv){
+ const g=G(vs[0].guardianId),ts=vs[0].checkOut;let tot=0;
+ let h=rcptHead(t("rcptExit"),vs[0].rno+(inv?" / "+inv.no:""),ts)+'<div class="r"><span>'+t("guardian")+'</span><span class="b">'+esc(g.name)+"</span></div><hr>";
+ vs.forEach(v=>{const dur=Math.round((v.checkOut-v.checkIn)/60000);tot+=(v.total||0);
+  h+='<div class="kid"><div class="b">'+esc(C(v.childId).name)+'</div><div class="r"><span>'+t("checkIn")+'</span><span>'+fTime(v.checkIn)+'</span></div><div class="r"><span>'+t("checkOut")+'</span><span>'+fTime(v.checkOut)+'</span></div><div class="r"><span>'+t("duration")+'</span><span>'+fMin(dur)+'</span></div><div class="r"><span>'+t("plan")+'</span><span>'+esc(pn(v))+"</span></div>"+
+  (v.payMode==="pkg"?'<div class="r"><span>'+t("fromPackage")+'</span><span>'+fMin(v.pkgMins||0)+"</span></div>":'<div class="r"><span>'+t("planPrice")+'</span><span>'+esc(money(v.price))+"</span></div>")+
+  (v.lateFee>0?'<div class="r"><span>'+t("late")+" ("+fMin(v.lateMin)+')</span><span>'+esc(money(v.lateFee))+"</span></div>":"")+"</div><hr>";
+ });
+ if(inv&&inv.disc&&inv.disc.amount>0)h+='<div class="r"><span>'+t("discount")+'</span><span>-'+esc(money(inv.disc.amount))+"</span></div>";
+ h+='<div class="r b"><span>'+t("total")+'</span><span>'+esc(money(inv?inv.total:tot))+'</span></div><hr><div class="c">'+t("thanks")+"</div>";
+ return h;
+}
 function receiptExit(v){
  const g=G(v.guardianId);const dur=Math.round((v.checkOut-v.checkIn)/60000);
  let h=rcptHead(t("rcptExit"),v.rno,v.checkOut)+'<div class="r"><span>'+t("guardian")+'</span><span class="b">'+esc(g.name)+'</span></div><hr><div class="kid"><div class="b">'+esc(C(v.childId).name)+'</div>';
@@ -532,9 +544,9 @@ function confirmGroupCheckout(){
   save();toast(t("exitDone"));render();
  };
  closeModal();
- if(!lines.length){fin(null);if(pr)vals.forEach(x=>printHTML(receiptExit(x.v)));return}
+ if(!lines.length){fin(null);if(pr)printHTML(receiptExitGroup(vals.map(x=>x.v),null));return}
  if(!requireShift())return;
- payOpen({title:t("grpTitle")+" – "+G(first.guardianId).name,lines:lines,gid:first.guardianId,print:pr,onDone:fin});
+ payOpen({title:t("grpTitle")+" – "+G(first.guardianId).name,lines:lines,gid:first.guardianId,print:pr,onDone:fin,customPrint:inv=>printHTML(receiptExitGroup(vals.map(x=>x.v),inv))});
 }
 
 /* ============ visits & daily report ============ */
@@ -676,7 +688,7 @@ function pCalc(){
  d=r2(Math.min(elig,d));return {sub:sub,d:d,total:r2(sub-d)};
 }
 function payOpen(o){
- P={title:o.title,lines:o.lines,gid:o.gid||null,print:o.print!==false,onDone:o.onDone,noDisc:!!o.noDisc,noPrepaid:!!o.noPrepaid,noCredit:!!o.noCredit,coupon:null,disc:{type:"pct",value:0,reason:"",by:null,open:false},rows:[]};
+ P={customPrint:o.customPrint||null,title:o.title,lines:o.lines,gid:o.gid||null,print:o.print!==false,onDone:o.onDone,noDisc:!!o.noDisc,noPrepaid:!!o.noPrepaid,noCredit:!!o.noCredit,coupon:null,disc:{type:"pct",value:0,reason:"",by:null,open:false},rows:[]};
  P.rows=[{m:"cash",a:pCalc().total}];payRender();
 }
 function payRender(){
@@ -733,9 +745,9 @@ function payConfirm(){
  S.invoices.push(inv);stockDeduct(inv);
  if(P.coupon){const cc=S.coupons.find(x=>x.code===P.coupon.code);if(cc)cc.used=(cc.used||0)+1;S.couponUses.push({code:P.coupon.code,gid:P.gid,inv:inv.id,at:now})}
  log("invoice","#"+inv.no+" total "+inv.total+(c.d>0?" disc "+c.d+" ("+disc.reason+")":"")+" "+inv.payments.map(p=>p.m+":"+p.a).join(",")+(credit?" credit:"+credit:""));save();
- const cb=P.onDone,pr=$("#ppr").checked;P=null;closeModal();
+ const cb=P.onDone,cp=P.customPrint,pr=$("#ppr").checked;P=null;closeModal();
  if(cb)cb(inv);
- if(pr)printHTML(receiptInvoice(inv));
+ if(pr){if(cp)cp(inv);else printHTML(receiptInvoice(inv))}
 }
 function receiptInvoice(inv){
  const u=S.users.find(x=>x.id===inv.cashier);
