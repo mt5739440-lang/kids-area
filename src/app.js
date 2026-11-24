@@ -312,7 +312,7 @@ function presentRows(){
   else if(i.state==="over")cell='<span class="tag over">'+t("late")+" "+fDur(i.left)+"</span>";
   else cell='<span class="tag '+i.state+'">'+fDur(i.left)+"</span>";
   const g=G(v.guardianId);
-  return "<tr><td>"+v.rno+"</td><td><b>"+esc(C(v.childId).name)+"</b>"+(C(v.childId).notes?'<div class="muted">'+esc(C(v.childId).notes)+"</div>":"")+"</td><td>"+esc(g.name)+"</td><td dir=\"ltr\">"+esc(phonesTxt(g))+"</td><td>"+esc(pn(v))+(v.prepaid?' <span class="badge">'+t("paidTag")+"</span>":"")+(v.payMode==="pkg"?' <span class="badge">'+t("pkgTag")+"</span>":"")+"</td><td>"+fTime(v.checkIn)+"</td><td>"+cell+'</td><td><button class="btn ok sm" onclick="checkoutModal(\''+v.id+"')\">"+t("doCheckout")+"</button>"+(S.visits.filter(x=>x.status==="in"&&x.guardianId===v.guardianId).length>1?' <button class="btn sm" onclick="checkoutGroupModal(\''+v.guardianId+"')\">"+t("grpExit")+" ("+S.visits.filter(x=>x.status==="in"&&x.guardianId===v.guardianId).length+")</button>":"")+"</td></tr>";
+  return "<tr><td>"+v.rno+"</td><td><b>"+esc(C(v.childId).name)+"</b>"+(C(v.childId).notes?'<div class="muted">'+esc(C(v.childId).notes)+"</div>":"")+"</td><td>"+esc(g.name)+"</td><td dir=\"ltr\">"+esc(phonesTxt(g))+"</td><td>"+esc(pn(v))+(v.prepaid?' <span class="badge">'+t("paidTag")+"</span>":"")+(v.payMode==="pkg"?' <span class="badge">'+t("pkgTag")+"</span>":"")+"</td><td>"+fTime(v.checkIn)+"</td><td>"+cell+'</td><td><button class="btn ok sm" onclick="checkoutModal(\''+v.id+"')\">"+t("doCheckout")+'</button> <button class="btn sm" onclick="waVisit(\''+v.id+"')\">💬</button>"+(S.visits.filter(x=>x.status==="in"&&x.guardianId===v.guardianId).length>1?' <button class="btn sm" onclick="checkoutGroupModal(\''+v.guardianId+"')\">"+t("grpExit")+" ("+S.visits.filter(x=>x.status==="in"&&x.guardianId===v.guardianId).length+")</button>":"")+"</td></tr>";
  }).join(""):'<tr><td colspan="8" class="muted">'+t("noneInside")+"</td></tr>";
 }
 window._md=0;["mousedown","touchstart"].forEach(e=>document.addEventListener(e,()=>{window._md=1},true));["mouseup","touchend","touchcancel"].forEach(e=>document.addEventListener(e,()=>{setTimeout(()=>{window._md=0},80)},true));
@@ -549,6 +549,63 @@ function confirmGroupCheckout(){
  payOpen({title:t("grpTitle")+" – "+G(first.guardianId).name,lines:lines,gid:first.guardianId,print:pr,onDone:fin,customPrint:inv=>printHTML(receiptExitGroup(vals.map(x=>x.v),inv))});
 }
 
+/* ============ WhatsApp click-to-chat (no API, nothing sent automatically) ============ */
+const WA_DEF={
+ soon:["مرحبًا {guardian}، تنبيه من {venue}: متبقي {left} على وقت {child}. موعد الانتهاء {until}.","Hello {guardian}, {venue}: {left} left for {child}. Ends at {until}."],
+ over:["مرحبًا {guardian}، تنبيه من {venue}: انتهى وقت {child} منذ {late}. برجاء الحضور لاستلامه.","Hello {guardian}, {venue}: {child}'s time ended {late} ago. Please come to pick up."],
+ in:["مرحبًا {guardian}، تم تسجيل دخول {child} في {venue} الساعة {time}. شكرًا لكم.","Hello {guardian}, {child} checked in at {venue} at {time}. Thank you."],
+ out:["مرحبًا {guardian}، تم تسجيل خروج {child} من {venue} الساعة {time}. الإجمالي {total}. شكرًا لزيارتكم.","Hello {guardian}, {child} checked out of {venue} at {time}. Total {total}. Thank you."],
+ party:["مرحبًا {guardian}، تذكير بحفلة {child} في {venue} يوم {date} الساعة {time}. المتبقي للدفع {due}.","Hello {guardian}, reminder: {child}'s party at {venue} on {date} at {time}. Remaining {due}."],
+ pkg:["مرحبًا {guardian}، رصيد باقتكم في {venue}: {hours}. صالحة حتى {until}.","Hello {guardian}, your package balance at {venue}: {hours}. Valid until {until}."]
+};
+function waTpl(k){const c=S.settings.wa&&S.settings.wa[k];return c&&c.trim()?c:WA_DEF[k][lang==="ar"?0:1]}
+function waFill(k,v){let x=waTpl(k);Object.keys(v).forEach(n=>{x=x.split("{"+n+"}").join(v[n]==null?"":v[n])});return x}
+function waNum(p){
+ let d=String(p||"").replace(/[^\d+]/g,"").replace(/^\+/,"").replace(/^00/,"");
+ if(/^0\d{9,10}$/.test(d))d="20"+d.slice(1);
+ else if(/^1\d{9}$/.test(d))d="20"+d;
+ return /^\d{10,15}$/.test(d)?d:"";
+}
+function waOpen(phone,text){
+ const n=waNum(phone);if(!n){toast(t("waNoPhone"));return}
+ log("whatsapp","+"+n);save();
+ window.open("https://wa.me/"+n+"?text="+encodeURIComponent(text),"_blank","noopener");
+}
+function waVars(g,extra){return Object.assign({guardian:g?g.name:"",venue:S.settings.venue},extra||{})}
+function waVisit(id){
+ const v=S.visits.find(x=>x.id===id);if(!v)return;
+ const g=G(v.guardianId),c=C(v.childId),now=Date.now();let k,x={child:c.name};
+ if(v.status==="out"){k="out";x.time=fTime(v.checkOut);x.total=money(v.total||0)}
+ else{
+  const i=info(v,now);
+  if(i.state==="over"){k="over";x.late=fMin(Math.abs(i.left)/60)}
+  else if(i.state==="open"){k="in";x.time=fTime(v.checkIn)}
+  else{k="soon";x.left=fMin(i.left/60);x.until=fTime(v.checkIn+v.minutes*60000)}
+ }
+ waOpen(phonesOf(g)[0],waFill(k,waVars(g,x)));
+}
+function waBooking(id){
+ const b=S.bookings.find(x=>x.id===id);if(!b)return;
+ waOpen(b.phone,waFill("party",waVars({name:b.name},{child:b.child,date:b.date,time:t12(b.start),due:money(bkDue(b))})));
+}
+function waGuardianPkg(gid){
+ const g=G(gid),subs=activeSubs(gid);
+ if(!subs.length){toast("—");return}
+ const mins=subs.reduce((s,x)=>s+x.remaining,0),exp=Math.min.apply(null,subs.map(x=>x.expiresAt));
+ waOpen(phonesOf(g)[0],waFill("pkg",waVars(g,{hours:fMin(mins),until:fDate(exp)})));
+}
+function waCard(){
+ if(!can("settings"))return "";
+ const ks=["soon","over","in","out","party","pkg"];
+ return '<div class="card"><h3>'+t("waCardT")+'</h3><div class="muted">'+t("waCardHelp")+"</div>"+ks.map(k=>'<label>'+t("wn_"+k)+'<textarea id="wat_'+k+'" rows="2">'+esc(waTpl(k))+"</textarea></label>").join("")+'<div class="row"><button class="btn pri" onclick="waSave()">'+t("save")+'</button><button class="btn" onclick="waReset()">'+t("waReset")+"</button></div></div>";
+}
+function waSave(){
+ if(!can("settings"))return;
+ const o={};["soon","over","in","out","party","pkg"].forEach(k=>{const v=($("#wat_"+k)||{}).value||"";if(v.trim()&&v.trim()!==WA_DEF[k][lang==="ar"?0:1])o[k]=v.trim()});
+ S.settings.wa=o;log("whatsapp templates","saved");save();toast(t("waSaved"));render();
+}
+function waReset(){if(!can("settings"))return;S.settings.wa={};save();toast(t("waSaved"));render()}
+
 /* ============ visits & daily report ============ */
 let hDay=null;
 views.history=function(){
@@ -559,7 +616,7 @@ views.history=function(){
  const avg=outs.length?outs.reduce((s,v)=>s+(v.checkOut-v.checkIn)/60000,0)/outs.length:0;
  (window._hT||$("#view")).innerHTML='<div class="bar"><h2>'+t("history")+'</h2><input type="date" id="hd" style="max-width:200px" value="'+hDay+'" onchange="hDay=this.value;render()"></div><div class="kpis"><div class="kpi">'+t("entries")+"<b>"+vs.length+'</b></div><div class="kpi">'+t("exits")+"<b>"+outs.length+'</b></div><div class="kpi">'+t("revenue")+"<b>"+money(rev)+'</b></div><div class="kpi">'+t("lateFees")+"<b>"+money(fees)+'</b></div><div class="kpi">'+t("avgDur")+"<b>"+fMin(avg)+'</b></div><div class="kpi">'+t("discounts")+"<b>"+money(discs)+'</b></div><div class="kpi">'+t("pkgSold")+"<b>"+pks+'</b></div><div class="kpi">'+t("partyPay")+"<b>"+money(pty)+"</b></div></div>"+
  '<div class="card"><table><thead><tr><th>#</th><th>'+t("child")+"</th><th>"+t("guardian")+"</th><th>"+t("plan")+"</th><th>"+t("checkIn")+"</th><th>"+t("checkOut")+"</th><th>"+t("lateFees")+"</th><th>"+t("total")+"</th><th>"+t("cashier")+"</th><th>"+t("status")+"</th><th></th></tr></thead><tbody>"+
- (vs.length?vs.map(v=>{const u=S.users.find(x=>x.id===v.cashier);return "<tr><td>"+v.rno+"</td><td>"+esc(C(v.childId).name)+"</td><td>"+esc(G(v.guardianId).name)+"</td><td>"+esc(pn(v))+"</td><td>"+fTime(v.checkIn)+"</td><td>"+(v.checkOut?fTime(v.checkOut):"–")+"</td><td>"+(v.lateFee?money(v.lateFee):"–")+"</td><td>"+(v.status==="out"?money(v.total):"–")+"</td><td>"+esc(u?u.name:"")+'</td><td><span class="tag '+(v.status==="in"?"ok":"open")+'">'+(v.status==="in"?t("in"):t("out"))+'</span></td><td><button class="btn sm" onclick="reprint(\''+v.id+"')\">"+t("reprint")+"</button></td></tr>"}).join(""):'<tr><td colspan="11" class="muted">'+t("none")+"</td></tr>")+"</tbody></table></div>";
+ (vs.length?vs.map(v=>{const u=S.users.find(x=>x.id===v.cashier);return "<tr><td>"+v.rno+"</td><td>"+esc(C(v.childId).name)+"</td><td>"+esc(G(v.guardianId).name)+"</td><td>"+esc(pn(v))+"</td><td>"+fTime(v.checkIn)+"</td><td>"+(v.checkOut?fTime(v.checkOut):"–")+"</td><td>"+(v.lateFee?money(v.lateFee):"–")+"</td><td>"+(v.status==="out"?money(v.total):"–")+"</td><td>"+esc(u?u.name:"")+'</td><td><span class="tag '+(v.status==="in"?"ok":"open")+'">'+(v.status==="in"?t("in"):t("out"))+'</span></td><td><button class="btn sm" onclick="reprint(\''+v.id+"')\">"+t("reprint")+'</button> <button class="btn sm" onclick="waVisit(\''+v.id+"')\">💬</button></td></tr>"}).join(""):'<tr><td colspan="11" class="muted">'+t("none")+"</td></tr>")+"</tbody></table></div>";
 };
 function reprint(id){
  const v=S.visits.find(x=>x.id===id);if(!v)return;
@@ -997,7 +1054,7 @@ function guardianRows(){
  const list=(q?guardianMatches(q):S.guardians.slice().sort((a,b)=>a.name.localeCompare(b.name,"ar"))).slice(0,60);
  $("#grows").innerHTML=list.length?list.map(g=>{
   const kids=S.children.filter(c=>c.guardianId===g.id);
-  return '<div class="card"><div class="bar"><div><b>'+esc(g.name)+'</b> <span dir="ltr" class="muted">'+esc(phonesTxt(g))+'</span>'+(g.notes?'<div class="muted">'+esc(g.notes)+"</div>":"")+acctLine(g.id)+'</div><div class="row" style="margin:0"><button class="btn sm" onclick="sellPackage(\''+g.id+"')\">"+t("sellPackage")+'</button><button class="btn sm" onclick="acctModal(\''+g.id+"')\">"+t("account")+'</button><button class="btn sm" onclick="guardianModal(\''+g.id+"')\">"+t("edit")+"</button></div></div>"+
+  return '<div class="card"><div class="bar"><div><b>'+esc(g.name)+'</b> <span dir="ltr" class="muted">'+esc(phonesTxt(g))+'</span>'+(g.notes?'<div class="muted">'+esc(g.notes)+"</div>":"")+acctLine(g.id)+'</div><div class="row" style="margin:0"><button class="btn sm" onclick="sellPackage(\''+g.id+"')\">"+t("sellPackage")+'</button><button class="btn sm" onclick="acctModal(\''+g.id+"')\">"+t("account")+'</button>'+(activeSubs(g.id).length?'<button class="btn sm" onclick="waGuardianPkg(\''+g.id+"')\">"+t("waBtn")+" – "+t("pkgTag")+"</button>":"")+'<button class="btn sm" onclick="guardianModal(\''+g.id+"')\">"+t("edit")+"</button></div></div>"+
    kids.map(c=>'<div class="line"><span>'+esc(c.name)+" • "+c.age+" "+t("years")+(c.notes?' <span class="muted">('+esc(c.notes)+")</span>":"")+'</span><span><span class="muted">'+S.visits.filter(v=>v.childId===c.id).length+" "+t("visitsCount")+'</span> <button class="btn sm" onclick="childModal(\''+g.id+"','"+c.id+"')\">"+t("edit")+"</button></span></div>").join("")+
    '<div class="row"><button class="btn sm" onclick="childModal(\''+g.id+"','')\">"+t("addChild")+"</button></div></div>";
  }).join(""):'<div class="muted">'+t("none")+"</div>";
@@ -1060,7 +1117,7 @@ function partyReminderHTML(){
  const today=dayKey(Date.now()),tom=addDays(today,1);
  const list=S.bookings.filter(b=>b.status==="confirmed"&&(b.date===today||b.date===tom)).sort((a,b)=>a.date===b.date?toMin(a.start)-toMin(b.start):(a.date<b.date?-1:1));
  if(!list.length)return "";
- return '<div class="alertbox party"><div>🎂 '+t("partyReminder")+"</div>"+list.map(b=>{const due=bkDue(b);return '<div class="line"><span>'+(b.date===today?t("today"):t("tomorrow"))+" • "+t12(b.start)+" – "+esc(b.child)+" ("+b.kids+" "+t("kidsS")+")"+(due>0?" • "+t("due")+" "+money(due):"")+"</span>"+(due>0&&can("partyPay")?'<button class="btn sm" onclick="bkCollect(\''+b.id+"')\">"+t("collectRemaining")+"</button>":"")+"</div>"}).join("")+"</div>";
+ return '<div class="alertbox party"><div>🎂 '+t("partyReminder")+"</div>"+list.map(b=>{const due=bkDue(b);return '<div class="line"><span>'+(b.date===today?t("today"):t("tomorrow"))+" • "+t12(b.start)+" – "+esc(b.child)+" ("+b.kids+" "+t("kidsS")+")"+(due>0?" • "+t("due")+" "+money(due):"")+"</span>"+(due>0&&can("partyPay")?'<button class="btn sm" onclick="bkCollect(\''+b.id+"')\">"+t("collectRemaining")+"</button>":"")+'<button class="btn sm" onclick="waBooking(\''+b.id+"')\">💬</button></div>"}).join("")+"</div>";
 }
 
 /* ---- calendar & list ---- */
@@ -1080,7 +1137,7 @@ views.parties=function(){
  }
  const up=S.bookings.filter(b=>b.status==="confirmed"&&b.date>=today).sort((a,b)=>a.date===b.date?toMin(a.start)-toMin(b.start):(a.date<b.date?-1:1));
  $("#view").innerHTML='<div class="bar"><h2>'+t("partiesTitle")+' – '+esc(S.settings.hallName)+'</h2><button class="btn pri" onclick="bkNew(\'\')">'+t("newBooking")+'</button></div><div class="card"><div class="bar"><button class="btn sm" onclick="pvMove(-1)">‹ '+t("prevM")+'</button><b>'+mname+'</b><button class="btn sm" onclick="pvMove(1)">'+t("nextM")+' ›</button></div><div class="cal">'+cells+'</div></div><div class="card"><h3>'+t("upcoming")+"</h3><table><thead><tr><th>#</th><th>"+t("date")+"</th><th>"+t("time")+"</th><th>"+t("birthdayChild")+"</th><th>"+t("clientName")+"</th><th>"+t("kidsCount")+"</th><th>"+t("bookingTotal")+"</th><th>"+t("paidSoFar")+"</th><th>"+t("due")+"</th><th></th></tr></thead><tbody>"+
- (up.length?up.map(b=>"<tr><td>"+b.no+"</td><td>"+b.date+"</td><td>"+t12(b.start)+" – "+t12(b.end)+"</td><td>"+esc(b.child)+"</td><td>"+esc(b.name)+' <span dir="ltr" class="muted">'+esc(b.phone)+"</span></td><td>"+b.kids+"</td><td>"+money(bkTotal(b))+"</td><td>"+money(bkPaid(b))+"</td><td>"+(bkDue(b)>0?'<span class="tag soon">'+money(bkDue(b))+"</span>":'<span class="tag ok">'+t("paidTag")+"</span>")+'</td><td><button class="btn sm" onclick="bkOpen(\''+b.id+"')\">"+t("details")+"</button></td></tr>").join(""):'<tr><td colspan="10" class="muted">'+t("noBookings")+"</td></tr>")+"</tbody></table></div>";
+ (up.length?up.map(b=>"<tr><td>"+b.no+"</td><td>"+b.date+"</td><td>"+t12(b.start)+" – "+t12(b.end)+"</td><td>"+esc(b.child)+"</td><td>"+esc(b.name)+' <span dir="ltr" class="muted">'+esc(b.phone)+"</span></td><td>"+b.kids+"</td><td>"+money(bkTotal(b))+"</td><td>"+money(bkPaid(b))+"</td><td>"+(bkDue(b)>0?'<span class="tag soon">'+money(bkDue(b))+"</span>":'<span class="tag ok">'+t("paidTag")+"</span>")+'</td><td><button class="btn sm" onclick="bkOpen(\''+b.id+"')\">"+t("details")+'</button> <button class="btn sm" onclick="waBooking(\''+b.id+"')\">💬</button></td></tr>").join(""):'<tr><td colspan="10" class="muted">'+t("noBookings")+"</td></tr>")+"</tbody></table></div>";
 };
 function pvMove(d){const p=PV.month.split("-").map(Number),x=new Date(Date.UTC(p[0],p[1]-1+d,1));PV.month=x.toISOString().slice(0,7);render()}
 
@@ -1806,7 +1863,9 @@ Object.assign(D,{
  expNeedNote:["اكتب بيان المصروف","Enter a description"],expClosedShift:["الوردية مغلقة؛ يلغيه مدير العمليات فقط","Shift is closed; only the operations manager can cancel it"],
  expShift:["مصروفات الوردية (من الدرج)","Shift expenses (from drawer)"],rp_exp:["المصروفات","Expenses"],rpExpCat:["حسب الفئة","By category"],rpExpDay:["حسب اليوم","By day"],rpExpList:["تفاصيل المصروفات","Expense details"],
  ec_clean:["نظافة","Cleaning"],ec_maint:["صيانة","Maintenance"],ec_hosp:["ضيافة","Hospitality"],ec_supplies:["مستلزمات","Supplies"],ec_transport:["مواصلات","Transport"],ec_labor:["عمالة يومية","Daily labor"],ec_other:["أخرى","Other"],
- userDel:["حذف","Delete"],grpExit:["خروج الأطفال معًا","Check out together"],grpTitle:["خروج الأطفال معًا","Group check-out"],grpTotal:["الإجمالي للجميع","Total for all"],hideOut:["إخفاء النافد","Hide out of stock"],showOut:["إظهار النافد","Show out of stock"],del:["حذف","Delete"],prodDelHas:["لا يمكن حذف منتج بيع من قبل — عطّله بدل الحذف (إلغاء تفعيل)","A product that was sold can't be deleted — deactivate it instead"],prodDelConf:["حذف هذا المنتج نهائيًا؟","Delete this product permanently?"],prodDeleted:["تم حذف المنتج","Product deleted"],userDelHas:["للمستخدم سجلات (فواتير أو ورديات أو مصروفات). عطّله بدل حذفه","This user has records. Deactivate instead of deleting"],userDelConf:["حذف المستخدم نهائيًا؟","Delete this user permanently?"],
+ userDel:["حذف","Delete"],waBtn:["واتساب","WhatsApp"],waNoPhone:["لا يوجد رقم موبايل صالح","No valid phone number"],waCardT:["رسائل واتساب لأولياء الأمور","WhatsApp messages"],waCardHelp:["الزر يفتح واتساب برسالة جاهزة ثم تضغط إرسال بنفسك، ولا يُرسل شيء تلقائيًا. المتغيرات: {guardian} {child} {venue} {left} {late} {time} {date} {total} {due} {hours} {until}","The button opens WhatsApp with a ready message; you press send yourself. Nothing is sent automatically. Variables: {guardian} {child} {venue} {left} {late} {time} {date} {total} {due} {hours} {until}"],waReset:["استرجاع الرسائل الافتراضية","Restore defaults"],waSaved:["تم حفظ الرسائل","Messages saved"],
+wn_soon:["رسالة قرب انتهاء الوقت","Time almost up"],wn_over:["رسالة تجاوز الوقت","Time exceeded"],wn_in:["رسالة تأكيد الدخول","Entry confirmation"],wn_out:["رسالة تأكيد الخروج","Exit confirmation"],wn_party:["رسالة تذكير بالحفلة","Party reminder"],wn_pkg:["رسالة رصيد الباقة","Package balance"],
+grpExit:["خروج الأطفال معًا","Check out together"],grpTitle:["خروج الأطفال معًا","Group check-out"],grpTotal:["الإجمالي للجميع","Total for all"],hideOut:["إخفاء النافد","Hide out of stock"],showOut:["إظهار النافد","Show out of stock"],del:["حذف","Delete"],prodDelHas:["لا يمكن حذف منتج بيع من قبل — عطّله بدل الحذف (إلغاء تفعيل)","A product that was sold can't be deleted — deactivate it instead"],prodDelConf:["حذف هذا المنتج نهائيًا؟","Delete this product permanently?"],prodDeleted:["تم حذف المنتج","Product deleted"],userDelHas:["للمستخدم سجلات (فواتير أو ورديات أو مصروفات). عطّله بدل حذفه","This user has records. Deactivate instead of deleting"],userDelConf:["حذف المستخدم نهائيًا؟","Delete this user permanently?"],
  userDelLast:["لا يمكن حذف آخر حساب إدارة","Cannot delete the last management account"],userDelSelf:["لا يمكنك حذف حسابك أنت","You cannot delete your own account"],userDeleted:["تم حذف المستخدم","User deleted"]
 });
 const EXP_CATS=["clean","maint","hosp","supplies","transport","labor","other"];
@@ -2390,6 +2449,7 @@ async function imFile(inp){
 }
 function imTemplate(){downloadXlsx("customers-template.xlsx",[{name:"Customers",head:[t("imGName"),t("imGPhone"),t("imCName"),t("imCAge"),t("imNotes")],rows:[["ولي أمر مثال","01012345678","طفل مثال","5",""]]}])}
 function imCard(){return '<div class="card"><h3>'+t("imTitle")+'</h3><div class="muted">'+t("imHelp")+'</div><div class="row"><label class="btn pri" style="cursor:pointer">'+t("imFile")+'<input type="file" accept=".xlsx,.csv,.txt,text/csv" style="display:none" onchange="imFile(this)"></label><button class="btn" onclick="imTemplate()">'+t("imTpl")+"</button></div></div>"}
+{const _wst=views.settingsBody;views.settingsBody=function(){_wst();(window._hT||$("#view")).insertAdjacentHTML("beforeend",waCard())}}
 {const _bk3=views.backupBody;views.backupBody=function(){_bk3();if(can("settings"))(window._hT||$("#view")).insertAdjacentHTML("beforeend",imCard())}}
 
 /* ============ PIN hashing (salted, iterated SHA-256) ============ */
