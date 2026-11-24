@@ -1180,6 +1180,16 @@ const shiftOf=id=>S.settings.shifts.find(x=>x.id===id)||null;
 const shiftName=x=>x?(x.name[lang]||x.name.ar):"";
 const shiftTxt=x=>x?shiftName(x)+" "+t12(x.start)+"–"+t12(x.end):"";
 const durMin=(a,b)=>{const x=toMin(a),y=toMin(b);return (isNaN(x)||isNaN(y))?0:(y-x+1440)%1440};
+Object.assign(D,{offDay:["يوم الراحة الأسبوعي","Weekly day off"],offNone:["بدون","None"],payOff:["راحة أسبوعية (مدفوعة)","Weekly off (paid)"],
+ wd0:["الأحد","Sunday"],wd1:["الاثنين","Monday"],wd2:["الثلاثاء","Tuesday"],wd3:["الأربعاء","Wednesday"],wd4:["الخميس","Thursday"],wd5:["الجمعة","Friday"],wd6:["السبت","Saturday"]});
+const wdOf=d=>new Date(d+"T12:00:00Z").getUTCDay();
+/* يوم راحة الموظف: صفّ الجدول إن وُجد (راحة صريحة أو وردية = يعمل) وإلا يومه الثابت */
+function isOffDay(e,d){
+ const rv=(S.roster[d]||{})[e.id];if(rv==="off")return true;if(rv)return false;
+ if(e.offDay===undefined||e.offDay===null||e.offDay==="")return false;
+ if(e.hireDate&&d<e.hireDate)return false;
+ return +e.offDay===wdOf(d);
+}
 const leaveOn=(eid,d)=>S.leaves.find(l=>l.emp===eid&&l.from<=d&&d<=l.to)||null;
 const payLocked=ym=>!!S.payrolls[ym];
 const empN=id=>(S.employees.find(e=>e.id===id)||{name:"?"}).name;
@@ -1211,10 +1221,10 @@ function monthBar(){
 /* ---- daily attendance ---- */
 hrTabs.attendance=function(){
  const d=HR.date,today=dayKey(Date.now()),emps=S.employees.filter(e=>e.active);
- let cp=0,ca=0,cl=0,cu=0;
+ let cp=0,ca=0,cl=0,cu=0,cof=0;
  const rows=emps.map(e=>{
-  const a=(S.attendance[d]||{})[e.id]||null,lv=leaveOn(e.id,d),rv=(S.roster[d]||{})[e.id],sh=shiftOf(rv),off=rv==="off";
-  if(a&&a.status==="present")cp++;else if(a&&a.status==="absent")ca++;else if(lv)cl++;else cu++;
+  const a=(S.attendance[d]||{})[e.id]||null,lv=leaveOn(e.id,d),rv=(S.roster[d]||{})[e.id],sh=shiftOf(rv),off=isOffDay(e,d);
+  if(a&&a.status==="present")cp++;else if(a&&a.status==="absent")ca++;else if(lv)cl++;else if(off)cof++;else cu++;
   const late=lateMin(a,sh),hrs=a&&a.status==="present"&&a.out?Math.round(durMin(a.in,a.out)/6)/10:null;
   const sel=`<select onchange="attStatus('${d}','${e.id}',this.value)" ${lv&&!a?"disabled":""}><option value="">—</option><option value="present" ${a&&a.status==="present"?"selected":""}>${t("st_present")}</option><option value="absent" ${a&&a.status==="absent"?"selected":""}>${t("st_absent")}</option></select>`;
   const tin=`<input type="time" style="max-width:120px" value="${a&&a.in||""}" ${a&&a.status==="present"?"":"disabled"} onchange="attTime('${d}','${e.id}','in',this.value)">`;
@@ -1223,7 +1233,7 @@ hrTabs.attendance=function(){
   const shTxt=off?t("st_off"):sh?shiftTxt(sh):'<span class="muted">'+t("notScheduled")+"</span>";
   return `<tr><td><b>${esc(e.name)}</b><div class="muted">${esc(e.job||"")}</div></td><td>${shTxt}</td><td>${lv&&!a?'<span class="tag open">'+t("st_leave")+" ("+t(lv.type==="paid"?"lt_paid":"lt_unpaid")+")</span>":sel}</td><td>${tin}</td><td>${tout}</td><td>${hrs===null?"–":hrs}</td><td>${late>0?'<span class="tag soon">'+fMin(late)+"</span>":"–"}</td><td>${quick}</td></tr>`;
  }).join("");
- $("#hrbody").innerHTML=dateBar()+`<div class="kpis">${kpi(t("st_present"),cp)}${kpi(t("st_absent"),ca)}${kpi(t("st_leave"),cl)}${kpi(t("st_unrec"),cu)}</div><div class="card"><table><thead><tr><th>${t("empName")}</th><th>${t("shiftLbl")}</th><th>${t("status")}</th><th>${t("inTime")}</th><th>${t("outTime")}</th><th>${t("hoursLbl")}</th><th>${t("lateLbl")}</th><th></th></tr></thead><tbody>${rows||'<tr><td colspan="8" class="muted">'+t("noEmployees")+"</td></tr>"}</tbody></table></div>`;
+ $("#hrbody").innerHTML=dateBar()+`<div class="kpis">${kpi(t("st_present"),cp)}${kpi(t("st_absent"),ca)}${kpi(t("st_leave"),cl)}${kpi(t("st_off"),cof)}${kpi(t("st_unrec"),cu)}</div><div class="card"><table><thead><tr><th>${t("empName")}</th><th>${t("shiftLbl")}</th><th>${t("status")}</th><th>${t("inTime")}</th><th>${t("outTime")}</th><th>${t("hoursLbl")}</th><th>${t("lateLbl")}</th><th></th></tr></thead><tbody>${rows||'<tr><td colspan="8" class="muted">'+t("noEmployees")+"</td></tr>"}</tbody></table></div>`;
 };
 function attEnsure(d,eid){S.attendance[d]=S.attendance[d]||{};return S.attendance[d][eid]=S.attendance[d][eid]||{status:"present",in:"",out:"",by:me.id,at:Date.now()}}
 function attStatus(d,eid,v){
@@ -1251,13 +1261,13 @@ hrTabs.roster=function(){
  const ws=HR.week||weekStart(HR.date);HR.week=ws;
  const days=[0,1,2,3,4,5,6].map(i=>addDays(ws,i)),emps=S.employees.filter(e=>e.active);
  const head=days.map(k=>{const p=k.split("-").map(Number);return "<th>"+new Date(Date.UTC(p[0],p[1]-1,p[2],12)).toLocaleDateString(loc(),{timeZone:"UTC",weekday:"short",day:"2-digit",month:"2-digit"})+"</th>"}).join("");
- const rows=emps.map(e=>"<tr><td><b>"+esc(e.name)+"</b></td>"+days.map(k=>{const v=(S.roster[k]||{})[e.id]||"";return `<td><select onchange="rosterSet('${k}','${e.id}',this.value)"><option value="">—</option>${S.settings.shifts.map(s=>`<option value="${s.id}" ${v===s.id?"selected":""}>${esc(shiftName(s))}</option>`).join("")}<option value="off" ${v==="off"?"selected":""}>${t("st_off")}</option></select></td>`}).join("")+"</tr>").join("");
+ const rows=emps.map(e=>"<tr><td><b>"+esc(e.name)+"</b></td>"+days.map(k=>{const v=(S.roster[k]||{})[e.id]||(isOffDay(e,k)?"off":"");return `<td><select onchange="rosterSet('${k}','${e.id}',this.value)"><option value="">—</option>${S.settings.shifts.map(s=>`<option value="${s.id}" ${v===s.id?"selected":""}>${esc(shiftName(s))}</option>`).join("")}<option value="off" ${v==="off"?"selected":""}>${t("st_off")}</option></select></td>`}).join("")+"</tr>").join("");
  $("#hrbody").innerHTML=`<div class="bar"><div class="row" style="margin:0"><button class="btn sm" onclick="HR.week=addDays(HR.week,-7);render()">‹ ${t("prevW")}</button><button class="btn sm" onclick="HR.week=addDays(HR.week,7);render()">${t("nextW")} ›</button></div><div class="row" style="margin:0"><button class="btn sm" onclick="rosterFill()">${t("rosterFill")}</button><button class="btn sm" onclick="rosterCopy()">${t("rosterCopy")}</button></div></div><div class="card"><table style="min-width:760px"><thead><tr><th>${t("empName")}</th>${head}</tr></thead><tbody>${rows||'<tr><td colspan="8" class="muted">'+t("noEmployees")+"</td></tr>"}</tbody></table></div>`;
 };
 function rosterSet(d,eid,v){S.roster[d]=S.roster[d]||{};if(v)S.roster[d][eid]=v;else delete S.roster[d][eid];log("roster",empN(eid)+" "+d+" "+(v||"-"));save()}
 function rosterFill(){
  const ws=HR.week;let n=0;
- for(let i=0;i<7;i++){const k=addDays(ws,i);S.employees.filter(e=>e.active&&e.shift).forEach(e=>{S.roster[k]=S.roster[k]||{};if(!S.roster[k][e.id]){S.roster[k][e.id]=e.shift;n++}})}
+ for(let i=0;i<7;i++){const k=addDays(ws,i);S.employees.filter(e=>e.active&&e.shift&&!isOffDay(e,k)).forEach(e=>{S.roster[k]=S.roster[k]||{};if(!S.roster[k][e.id]){S.roster[k][e.id]=e.shift;n++}})}
  log("roster fill",ws+" +"+n);save();render();
 }
 function rosterCopy(){
@@ -1274,14 +1284,14 @@ hrTabs.employees=function(){
 };
 function empModal(id){
  const e=id?S.employees.find(x=>x.id===id):null;
- modal(`<h3>${e?t("editEmp"):t("addEmp")}</h3><label>${t("empName")}<input id="en1" value="${esc(e?e.name:"")}"></label><div class="grid2" style="gap:8px"><label>${t("jobTitle")}<input id="en2" value="${esc(e?e.job:"")}"></label><label>${t("phone")}<input id="en3" dir="ltr" inputmode="tel" value="${esc(e?e.phone:"")}"></label><label>${t("dailyWage")}<input id="en4" type="number" min="0" step="0.5" value="${e?e.wage:""}"></label><label>${t("hireDate")}<input id="en5" type="date" value="${esc(e?e.hireDate:"")}"></label></div><label>${t("defShift")}<select id="en6"><option value="">${t("noShift")}</option>${S.settings.shifts.map(s=>`<option value="${s.id}" ${e&&e.shift===s.id?"selected":""}>${esc(shiftTxt(s))}</option>`).join("")}</select></label><label>${t("notes")}<input id="en7" value="${esc(e?e.notes:"")}"></label><label class="opt"><input type="checkbox" id="en8" ${!e||e.active?"checked":""}><span>${t("active")}</span></label><div class="row"><button class="btn pri" onclick="saveEmp('${id||""}')">${t("save")}</button><button class="btn" onclick="closeModal()">${t("cancel")}</button></div>`);
+ modal(`<h3>${e?t("editEmp"):t("addEmp")}</h3><label>${t("empName")}<input id="en1" value="${esc(e?e.name:"")}"></label><div class="grid2" style="gap:8px"><label>${t("jobTitle")}<input id="en2" value="${esc(e?e.job:"")}"></label><label>${t("phone")}<input id="en3" dir="ltr" inputmode="tel" value="${esc(e?e.phone:"")}"></label><label>${t("dailyWage")}<input id="en4" type="number" min="0" step="0.5" value="${e?e.wage:""}"></label><label>${t("hireDate")}<input id="en5" type="date" value="${esc(e?e.hireDate:"")}"></label><label>${t("offDay")}<select id="en9"><option value="">${t("offNone")}</option>${[5,6,0,1,2,3,4].map(i=>`<option value="${i}" ${e&&e.offDay!==undefined&&e.offDay!==""&&+e.offDay===i?"selected":""}>${t("wd"+i)}</option>`).join("")}</select></label></div><label>${t("defShift")}<select id="en6"><option value="">${t("noShift")}</option>${S.settings.shifts.map(s=>`<option value="${s.id}" ${e&&e.shift===s.id?"selected":""}>${esc(shiftTxt(s))}</option>`).join("")}</select></label><label>${t("notes")}<input id="en7" value="${esc(e?e.notes:"")}"></label><label class="opt"><input type="checkbox" id="en8" ${!e||e.active?"checked":""}><span>${t("active")}</span></label><div class="row"><button class="btn pri" onclick="saveEmp('${id||""}')">${t("save")}</button><button class="btn" onclick="closeModal()">${t("cancel")}</button></div>`);
 }
 function saveEmp(id){
  const name=$("#en1").value.trim(),wage=num($("#en4").value),ph=normPhone($("#en3").value);
  if(!name){toast(t("needName"));return}
  if(!(wage>0)){toast(t("badAmount"));return}
  if(ph&&!/^\+?\d{8,15}$/.test(ph)){toast(t("badPhone"));return}
- const o={name:name,job:$("#en2").value.trim(),phone:ph,wage:wage,hireDate:$("#en5").value,shift:$("#en6").value,notes:$("#en7").value.trim(),active:$("#en8").checked};
+ const o={name:name,job:$("#en2").value.trim(),phone:ph,wage:wage,hireDate:$("#en5").value,shift:$("#en6").value,offDay:$("#en9").value===""?"":+$("#en9").value,notes:$("#en7").value.trim(),active:$("#en8").checked};
  if(id)Object.assign(S.employees.find(x=>x.id===id),o);else S.employees.push(Object.assign({id:uid()},o));
  log(id?"edit employee":"new employee",name);save();closeModal();render();
 }
@@ -1362,22 +1372,23 @@ function saveBonus(id){
 
 /* ---- payroll ---- */
 function payCalc(ym,e){
- let present=0,pl=0,absent=0,mins=0;
+ let present=0,pl=0,absent=0,mins=0,offPaid=0;
  monthDays(ym).forEach(d=>{
   const a=(S.attendance[d]||{})[e.id],lv=leaveOn(e.id,d);
   if(a&&a.status==="present"){present++;if(a.out)mins+=durMin(a.in,a.out)}
   else if(lv&&lv.type==="paid")pl++;
   else if(a&&a.status==="absent")absent++;
+  else if(isOffDay(e,d)&&!(lv&&lv.type!=="paid"))offPaid++;
  });
  const pen=S.penalties.filter(p=>p.emp===e.id&&p.date.slice(0,7)===ym),adv=S.advances.filter(p=>p.emp===e.id&&p.deductMonth===ym),bon=S.bonuses.filter(p=>p.emp===e.id&&p.date.slice(0,7)===ym);
- const gross=r2(e.wage*(present+pl)),penT=r2(pen.reduce((s,p)=>s+p.amount,0)),advT=r2(adv.reduce((s,p)=>s+p.amount,0)),bonT=r2(bon.reduce((s,p)=>s+p.amount,0));
- return {emp:e.id,name:e.name,job:e.job||"",wage:e.wage,present:present,paidLeave:pl,absent:absent,hours:Math.round(mins/6)/10,gross:gross,bonus:bonT,pen:penT,adv:advT,net:r2(gross+bonT-penT-advT),bonList:bon.map(p=>({date:p.date,amount:p.amount,reason:p.reason})),penList:pen.map(p=>({date:p.date,amount:p.amount,reason:p.reason})),advList:adv.map(p=>({date:p.date,amount:p.amount,reason:p.reason}))};
+ const gross=r2(e.wage*(present+pl+offPaid)),penT=r2(pen.reduce((s,p)=>s+p.amount,0)),advT=r2(adv.reduce((s,p)=>s+p.amount,0)),bonT=r2(bon.reduce((s,p)=>s+p.amount,0));
+ return {emp:e.id,name:e.name,job:e.job||"",wage:e.wage,present:present,paidLeave:pl,offPaid:offPaid,absent:absent,hours:Math.round(mins/6)/10,gross:gross,bonus:bonT,pen:penT,adv:advT,net:r2(gross+bonT-penT-advT),bonList:bon.map(p=>({date:p.date,amount:p.amount,reason:p.reason})),penList:pen.map(p=>({date:p.date,amount:p.amount,reason:p.reason})),advList:adv.map(p=>({date:p.date,amount:p.amount,reason:p.reason}))};
 }
-function payLines(ym){return S.payrolls[ym]?S.payrolls[ym].lines:S.employees.map(e=>payCalc(ym,e)).filter((l,i)=>S.employees[i].active||l.present+l.paidLeave>0)}
+function payLines(ym){return S.payrolls[ym]?S.payrolls[ym].lines:S.employees.map(e=>payCalc(ym,e)).filter((l,i)=>S.employees[i].active||l.present+l.paidLeave+(l.offPaid||0)>0)}
 hrTabs.payroll=function(){
  const ym=HR.month,pr=S.payrolls[ym],lines=payLines(ym);
  const tot=k=>r2(lines.reduce((s,l)=>s+l[k],0));
- $("#hrbody").innerHTML=monthBar()+`<div class="card"><div class="bar"><h3>${t("t_payroll")} ${ym} ${pr?'<span class="tag ok">'+t("payApproved")+"</span>":""}</h3><div class="row" style="margin:0">${pr?(can("reset")?`<button class="btn sm" onclick="payReopen()">${t("payReopen")}</button>`:""):`<button class="btn sm ok" onclick="payApprove()">${t("payApprove")}</button>`}<button class="btn sm" onclick="payPrintSheet()">${t("printSheet")}</button></div></div><table style="min-width:900px"><thead><tr><th>${t("empName")}</th><th>${t("dailyWage")}</th><th>${t("payDays")}</th><th>${t("payPaidLeave")}</th><th>${t("payAbsent")}</th><th>${t("payGross")}</th><th>${t("payBonus")}</th><th>${t("payPen")}</th><th>${t("payAdv")}</th><th>${t("payNet")}</th><th></th></tr></thead><tbody>${lines.map(l=>{const pd=pr&&pr.paid&&pr.paid[l.emp];return `<tr><td><b>${esc(l.name)}</b></td><td>${money(l.wage)}</td><td>${l.present}</td><td>${l.paidLeave}</td><td>${l.absent}</td><td>${money(l.gross)}</td><td>${l.bonus?"+"+money(l.bonus):"–"}</td><td>${l.pen?"−"+money(l.pen):"–"}</td><td>${l.adv?"−"+money(l.adv):"–"}</td><td><b style="color:${l.net<0?"var(--bad)":"inherit"}">${money(l.net)}</b>${l.net<0?'<div class="muted">'+t("negNet")+"</div>":""}</td><td><button class="btn sm" onclick="paySlip('${l.emp}')">${t("paySlip")}</button> ${pr?(pd?'<span class="tag ok">'+t("payPaidTag")+"</span>":`<button class="btn sm ok" onclick="payPaid('${l.emp}')">${t("payMarkPaid")}</button>`):""}</td></tr>`}).join("")||'<tr><td colspan="11" class="muted">'+t("noEmployees")+"</td></tr>"}<tr><td><b>${t("payTotal")}</b></td><td></td><td></td><td></td><td></td><td><b>${money(tot("gross"))}</b></td><td>${money(tot("bonus"))}</td><td>${money(tot("pen"))}</td><td>${money(tot("adv"))}</td><td><b>${money(tot("net"))}</b></td><td></td></tr></tbody></table>${pr?'<div class="muted">'+t("approvedBy")+" "+esc((S.users.find(u=>u.id===pr.by)||{name:""}).name)+" • "+fDate(pr.at)+"</div>":""}</div>`;
+ $("#hrbody").innerHTML=monthBar()+`<div class="card"><div class="bar"><h3>${t("t_payroll")} ${ym} ${pr?'<span class="tag ok">'+t("payApproved")+"</span>":""}</h3><div class="row" style="margin:0">${pr?(can("reset")?`<button class="btn sm" onclick="payReopen()">${t("payReopen")}</button>`:""):`<button class="btn sm ok" onclick="payApprove()">${t("payApprove")}</button>`}<button class="btn sm" onclick="payPrintSheet()">${t("printSheet")}</button></div></div><table style="min-width:900px"><thead><tr><th>${t("empName")}</th><th>${t("dailyWage")}</th><th>${t("payDays")}</th><th>${t("payPaidLeave")}</th><th>${t("payOff")}</th><th>${t("payAbsent")}</th><th>${t("payGross")}</th><th>${t("payBonus")}</th><th>${t("payPen")}</th><th>${t("payAdv")}</th><th>${t("payNet")}</th><th></th></tr></thead><tbody>${lines.map(l=>{const pd=pr&&pr.paid&&pr.paid[l.emp];return `<tr><td><b>${esc(l.name)}</b></td><td>${money(l.wage)}</td><td>${l.present}</td><td>${l.paidLeave}</td><td>${l.offPaid||0}</td><td>${l.absent}</td><td>${money(l.gross)}</td><td>${l.bonus?"+"+money(l.bonus):"–"}</td><td>${l.pen?"−"+money(l.pen):"–"}</td><td>${l.adv?"−"+money(l.adv):"–"}</td><td><b style="color:${l.net<0?"var(--bad)":"inherit"}">${money(l.net)}</b>${l.net<0?'<div class="muted">'+t("negNet")+"</div>":""}</td><td><button class="btn sm" onclick="paySlip('${l.emp}')">${t("paySlip")}</button> ${pr?(pd?'<span class="tag ok">'+t("payPaidTag")+"</span>":`<button class="btn sm ok" onclick="payPaid('${l.emp}')">${t("payMarkPaid")}</button>`):""}</td></tr>`}).join("")||'<tr><td colspan="11" class="muted">'+t("noEmployees")+"</td></tr>"}<tr><td><b>${t("payTotal")}</b></td><td></td><td></td><td></td><td></td><td><b>${money(tot("gross"))}</b></td><td>${money(tot("bonus"))}</td><td>${money(tot("pen"))}</td><td>${money(tot("adv"))}</td><td><b>${money(tot("net"))}</b></td><td></td></tr></tbody></table>${pr?'<div class="muted">'+t("approvedBy")+" "+esc((S.users.find(u=>u.id===pr.by)||{name:""}).name)+" • "+fDate(pr.at)+"</div>":""}</div>`;
 };
 function payApprove(){
  const ym=HR.month;if(S.payrolls[ym])return;
@@ -1389,12 +1400,12 @@ function payReopen(){const ym=HR.month;if(!S.payrolls[ym]||!can("reset"))return;
 function payPaid(eid){const pr=S.payrolls[HR.month];if(!pr)return;pr.paid[eid]={at:Date.now(),by:me.id};log("payroll paid",empN(eid)+" "+HR.month);save();render()}
 function payPrintSheet(){
  const ym=HR.month,lines=payLines(ym),tot=k=>r2(lines.reduce((s,l)=>s+l[k],0));
- printA4("<h1>"+esc(S.settings.venue)+"</h1><h2>"+t("t_payroll")+" – "+ym+"</h2><table><tr><th>"+t("empName")+"</th><th>"+t("dailyWage")+"</th><th>"+t("payDays")+"</th><th>"+t("payPaidLeave")+"</th><th>"+t("payGross")+"</th><th>"+t("payBonus")+"</th><th>"+t("payPen")+"</th><th>"+t("payAdv")+"</th><th>"+t("payNet")+"</th></tr>"+lines.map(l=>"<tr><td>"+esc(l.name)+"</td><td>"+money(l.wage)+"</td><td>"+l.present+"</td><td>"+l.paidLeave+"</td><td>"+money(l.gross)+"</td><td>"+money(l.bonus)+"</td><td>"+money(l.pen)+"</td><td>"+money(l.adv)+"</td><td><b>"+money(l.net)+"</b></td></tr>").join("")+"<tr><th>"+t("payTotal")+"</th><td></td><td></td><td></td><th>"+money(tot("gross"))+"</th><th>"+money(tot("bonus"))+"</th><th>"+money(tot("pen"))+"</th><th>"+money(tot("adv"))+"</th><th>"+money(tot("net"))+'</th></tr></table><div class="sig"><div>'+t("signStaff")+"</div><div>"+t("approvedBy")+"</div></div>");
+ printA4("<h1>"+esc(S.settings.venue)+"</h1><h2>"+t("t_payroll")+" – "+ym+"</h2><table><tr><th>"+t("empName")+"</th><th>"+t("dailyWage")+"</th><th>"+t("payDays")+"</th><th>"+t("payPaidLeave")+"</th><th>"+t("payOff")+"</th><th>"+t("payGross")+"</th><th>"+t("payBonus")+"</th><th>"+t("payPen")+"</th><th>"+t("payAdv")+"</th><th>"+t("payNet")+"</th></tr>"+lines.map(l=>"<tr><td>"+esc(l.name)+"</td><td>"+money(l.wage)+"</td><td>"+l.present+"</td><td>"+l.paidLeave+"</td><td>"+(l.offPaid||0)+"</td><td>"+money(l.gross)+"</td><td>"+money(l.bonus)+"</td><td>"+money(l.pen)+"</td><td>"+money(l.adv)+"</td><td><b>"+money(l.net)+"</b></td></tr>").join("")+"<tr><th>"+t("payTotal")+"</th><td></td><td></td><td></td><td></td><th>"+money(tot("gross"))+"</th><th>"+money(tot("bonus"))+"</th><th>"+money(tot("pen"))+"</th><th>"+money(tot("adv"))+"</th><th>"+money(tot("net"))+'</th></tr></table><div class="sig"><div>'+t("signStaff")+"</div><div>"+t("approvedBy")+"</div></div>");
 }
 function paySlip(eid){
  const ym=HR.month,l=payLines(ym).find(x=>x.emp===eid);if(!l)return;
  const r=(a,v)=>"<tr><th style=\"width:45%\">"+a+"</th><td>"+v+"</td></tr>";
- printA4("<h1>"+esc(S.settings.venue)+"</h1><h2>"+t("paySlip")+" – "+ym+"</h2><table>"+r(t("empName"),esc(l.name)+(l.job?" ("+esc(l.job)+")":""))+r(t("dailyWage"),money(l.wage))+r(t("payDays"),l.present)+r(t("payPaidLeave"),l.paidLeave)+r(t("payAbsent"),l.absent)+r(t("payGross"),money(l.gross))+"</table><table>"+
+ printA4("<h1>"+esc(S.settings.venue)+"</h1><h2>"+t("paySlip")+" – "+ym+"</h2><table>"+r(t("empName"),esc(l.name)+(l.job?" ("+esc(l.job)+")":""))+r(t("dailyWage"),money(l.wage))+r(t("payDays"),l.present)+r(t("payPaidLeave"),l.paidLeave)+r(t("payOff"),l.offPaid||0)+r(t("payAbsent"),l.absent)+r(t("payGross"),money(l.gross))+"</table><table>"+
   (l.bonList&&l.bonList.length?l.bonList.map(p=>r(t("payBonus")+" "+p.date+(p.reason?" – "+esc(p.reason):""),"+"+money(p.amount))).join(""):"")+(l.penList.length?l.penList.map(p=>r(t("payPen")+" "+p.date+(p.reason?" – "+esc(p.reason):""),"−"+money(p.amount))).join(""):"")+(l.advList.length?l.advList.map(p=>r(t("payAdv")+" ("+p.date+")"+(p.reason?" – "+esc(p.reason):""),"−"+money(p.amount))).join(""):"")+r(t("payNet"),"<b>"+money(l.net)+"</b>")+'</table><div class="sig"><div>'+t("signStaff")+"</div><div>"+t("approvedBy")+"</div></div>");
 }
 
@@ -1655,7 +1666,7 @@ RT.hrinv=function(a,b){
  const ym=b.slice(0,7),sh=[];
  if(can("hr")){
   const L=payLines(ym),tt=k=>r2(L.reduce((s,l)=>s+l[k],0));
-  sh.push({name:t("rpPay"),title:t("rpPay")+" – "+ym,head:[t("empName"),t("rpPresent"),t("payPaidLeave"),t("rpAbsent"),t("payGross"),t("payBonus"),t("payPen"),t("payAdv"),t("payNet")],rows:L.map(l=>[l.name,l.present,l.paidLeave,l.absent,l.gross,l.bonus||0,l.pen,l.adv,l.net]).concat([[t("rpTotal"),"","","",tt("gross"),tt("bonus"),tt("pen"),tt("adv"),tt("net")]]),total:true});
+  sh.push({name:t("rpPay"),title:t("rpPay")+" – "+ym,head:[t("empName"),t("rpPresent"),t("payPaidLeave"),t("payOff"),t("rpAbsent"),t("payGross"),t("payBonus"),t("payPen"),t("payAdv"),t("payNet")],rows:L.map(l=>[l.name,l.present,l.paidLeave,l.offPaid||0,l.absent,l.gross,l.bonus||0,l.pen,l.adv,l.net]).concat([[t("rpTotal"),"","","","",tt("gross"),tt("bonus"),tt("pen"),tt("adv"),tt("net")]]),total:true});
  }
  const sold={};S.stockLog.forEach(m=>{const k=dayKey(m.at);if(k>=a&&k<=b&&(m.type==="sale"||m.type==="void"))sold[m.pid]=(sold[m.pid]||0)-m.d});
  sh.push({name:t("rpStockTitle"),title:t("rpStockTitle"),head:[t("name"),t("invStock"),t("invMin"),t("status"),t("rpSold")],rows:S.products.filter(p=>p.track).map(p=>[pname(p),stockOf(p),p.min||0,isLow(p)?t("invLow"):t("invOk"),sold[p.id]||0])});
