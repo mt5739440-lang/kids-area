@@ -300,7 +300,7 @@ function presentRows(){
   else if(i.state==="over")cell='<span class="tag over">'+t("late")+" "+fDur(i.left)+"</span>";
   else cell='<span class="tag '+i.state+'">'+fDur(i.left)+"</span>";
   const g=G(v.guardianId);
-  return "<tr><td>"+v.rno+"</td><td><b>"+esc(C(v.childId).name)+"</b>"+(C(v.childId).notes?'<div class="muted">'+esc(C(v.childId).notes)+"</div>":"")+"</td><td>"+esc(g.name)+"</td><td dir=\"ltr\">"+esc(phonesTxt(g))+"</td><td>"+esc(pn(v))+(v.prepaid?' <span class="badge">'+t("paidTag")+"</span>":"")+(v.payMode==="pkg"?' <span class="badge">'+t("pkgTag")+"</span>":"")+"</td><td>"+fTime(v.checkIn)+"</td><td>"+cell+'</td><td><button class="btn ok sm" onclick="checkoutModal(\''+v.id+"')\">"+t("doCheckout")+"</button></td></tr>";
+  return "<tr><td>"+v.rno+"</td><td><b>"+esc(C(v.childId).name)+"</b>"+(C(v.childId).notes?'<div class="muted">'+esc(C(v.childId).notes)+"</div>":"")+"</td><td>"+esc(g.name)+"</td><td dir=\"ltr\">"+esc(phonesTxt(g))+"</td><td>"+esc(pn(v))+(v.prepaid?' <span class="badge">'+t("paidTag")+"</span>":"")+(v.payMode==="pkg"?' <span class="badge">'+t("pkgTag")+"</span>":"")+"</td><td>"+fTime(v.checkIn)+"</td><td>"+cell+'</td><td><button class="btn ok sm" onclick="checkoutModal(\''+v.id+"')\">"+t("doCheckout")+"</button>"+(S.visits.filter(x=>x.status==="in"&&x.guardianId===v.guardianId).length>1?' <button class="btn sm" onclick="checkoutGroupModal(\''+v.guardianId+"')\">"+t("grpExit")+" ("+S.visits.filter(x=>x.status==="in"&&x.guardianId===v.guardianId).length+")</button>":"")+"</td></tr>";
  }).join(""):'<tr><td colspan="8" class="muted">'+t("noneInside")+"</td></tr>";
 }
 window._md=0;["mousedown","touchstart"].forEach(e=>document.addEventListener(e,()=>{window._md=1},true));["mouseup","touchend","touchcancel"].forEach(e=>document.addEventListener(e,()=>{setTimeout(()=>{window._md=0},80)},true));
@@ -468,6 +468,73 @@ function confirmCheckout(){
  if(!lines.length){fin(null);if(pr)printHTML(receiptExit(v));return}
  if(!requireShift())return;
  payOpen({title:t("exitTitle")+" – "+C(v.childId).name,lines:lines,gid:v.guardianId,print:pr,onDone:fin});
+}
+
+/* ---- group check-out: all of one guardian's children in a single payment ---- */
+function groupCalcs(vs,now){
+ let avail=0;const gid=vs[0].guardianId;avail=pkgAvail(gid);
+ return vs.map(v=>{const c=calc(v,now);
+  if(c.pkg){const use=Math.min(c.pkg.mins,avail);avail-=use;const extra=c.pkg.mins-use;c.pkg={mins:c.pkg.mins,use:use,extra:extra};c.base=r2(extra/30*openRate())}
+  return {v:v,c:c}});
+}
+function checkoutGroupModal(gid,ts){
+ const vs=S.visits.filter(x=>x.status==="in"&&x.guardianId===gid).sort((a,b)=>a.checkIn-b.checkIn);
+ if(vs.length<2){if(vs[0])checkoutModal(vs[0].id,ts);return}
+ const now=ts||Date.now(),items=groupCalcs(vs,now);
+ window._co={id:vs[0].id,group:gid,ts:now,items:items,prep:false,c:items[0].c};
+ const rows=items.map((it,i)=>{const v=it.v,c=it.c,open=v.planType==="open";
+  let priceHtml;
+  if(c.pkg)priceHtml='<div class="line"><span>'+t("fromPackage")+"</span><span>"+fMin(c.pkg.use)+(c.pkg.extra?" + "+fMin(c.pkg.extra)+" • "+money(c.base):"")+"</span></div>";
+  else if(c.sugBase!==undefined&&!v.prepaid&&c.late===0)priceHtml='<label>'+t("priceEdit")+" ("+money(v.price)+')<input id="gbp'+i+'" type="number" min="0" step="0.5" value="'+c.sugBase+'" oninput="grpUpdate()"></label>';
+  else priceHtml='<div class="line"><span>'+t("planPrice")+(v.prepaid?" ("+t("paidTag")+")":"")+"</span><span>"+money(v.prepaid?0:c.base)+"</span></div>";
+  const feeHtml=(open||c.late===0)?"":'<div class="line"><span>'+t("lateMin")+"</span><span>"+fMin(c.late)+'</span></div><label>'+t("lateFee")+'<input id="gfee'+i+'" type="number" min="0" step="0.5" value="'+c.sug+'" oninput="grpUpdate()" '+(can("late")?"":"disabled")+"></label>";
+  return '<div class="card" style="margin:0 0 8px"><b>'+esc(C(v.childId).name)+'</b> <span class="muted">#'+v.rno+" • "+esc(pn(v))+" • "+fMin(c.el)+"</span>"+priceHtml+feeHtml+"</div>"}).join("");
+ modal("<h3>"+t("grpTitle")+" – "+esc(G(gid).name)+'</h3><div class="muted">'+t("checkOut")+": "+fTime(now)+"</div><hr>"+rows+(S.settings.pickupCheck?pickupBlock(vs[0]):"")+'<div class="line"><span>'+t("grpTotal")+'</span><span class="tot" id="gtot"></span></div><label class="opt"><input type="checkbox" id="cpr" checked><span>'+t("printReceipt")+'</span></label><div class="row"><button class="btn ok" onclick="confirmGroupCheckout()">'+t("confirmExit")+'</button><button class="btn" onclick="checkoutGroupModal(\''+gid+'\')">'+t("refreshTime")+'</button><button class="btn" onclick="closeModal()">'+t("cancel")+"</button></div>");
+ grpUpdate();
+}
+function grpVals(){
+ return window._co.items.map((it,i)=>{const v=it.v,c=it.c,open=v.planType==="open";
+  const be=$("#gbp"+i),fe=$("#gfee"+i),pn_=e=>{const n=parseFloat(norm(e.value));return isFinite(n)&&n>=0?n:0};
+  const base=(!v.prepaid&&!c.pkg&&c.sugBase!==undefined)?(be?pn_(be):c.sugBase):c.base;
+  const fee=open?0:(fe?pn_(fe):0);
+  return {v:v,c:c,base:base,fee:fee,charged:(v.prepaid?0:base)+fee};
+ });
+}
+function grpUpdate(){const e=$("#gtot");if(e)e.textContent=money(grpVals().reduce((s,x)=>s+x.charged,0))}
+function confirmGroupCheckout(){
+ const o=window._co;if(!o||!o.group)return;
+ const vals=grpVals();if(vals.some(x=>x.v.status!=="in"))return;
+ const first=vals[0].v;let pk=null;
+ if(S.settings.pickupCheck){
+  const ov=window._pkOv&&window._pkOv.id===first.id?window._pkOv:null;
+  if(ov)pk={other:true,approvedBy:ov.by};
+  else{const typed=norm(($("#cpk")||{}).value||"").replace(/\D/g,"");if(typed.length!==4||phone4s(first.guardianId).indexOf(typed)<0){toast(t("pkBad"));log("pickup mismatch","#"+first.rno);save();return}pk={ok:true}}
+ }
+ const pr=$("#cpr").checked,lines=[];
+ vals.forEach(x=>{const v=x.v,c=x.c,nm=C(v.childId).name;
+  if(!v.prepaid){
+   if(c.pkg){if(c.base>0)lines.push({type:"visit",name:t("extraTime")+" – "+nm,qty:1,price:c.base})}
+   else if(x.base>0)lines.push({type:"visit",name:pn(v)+" – "+nm,qty:1,price:x.base});
+  }
+  if(x.fee>0)lines.push({type:"late",name:t("late")+" – "+nm,qty:1,price:x.fee});
+ });
+ const fin=inv=>{
+  vals.forEach(x=>{const v=x.v,c=x.c,open=v.planType==="open";
+   v.checkOut=o.ts;v.status="out";v.pickup=pk;v.outBy=me.id;v.lateMin=c.late;v.suggestedFee=c.sug;v.lateFee=x.fee;v.lateNote="";
+   if(open){v.price=c.base;v.units=c.units}else if(!v.prepaid&&!c.pkg&&x.base!==v.price){v.priceOrig=v.price;v.price=x.base}
+   if(c.pkg&&c.pkg.use>0){pkgDeduct(v.guardianId,c.pkg.use,v.id);v.pkgMins=c.pkg.use}
+   v.total=x.base+x.fee;
+   if(inv)v.exitInvoiceId=inv.id;
+   log("check-out","#"+v.rno+" "+C(v.childId).name+" total "+v.total+" (group)");
+  });
+  window._pkOv=null;
+  if(inv)inv.visitIds=vals.map(x=>x.v.id);
+  save();toast(t("exitDone"));render();
+ };
+ closeModal();
+ if(!lines.length){fin(null);if(pr)vals.forEach(x=>printHTML(receiptExit(x.v)));return}
+ if(!requireShift())return;
+ payOpen({title:t("grpTitle")+" – "+G(first.guardianId).name,lines:lines,gid:first.guardianId,print:pr,onDone:fin});
 }
 
 /* ============ visits & daily report ============ */
@@ -1446,7 +1513,7 @@ function pickupBlock(v){
 }
 function pickupOther(){
  const o=window._co;if(!o)return;
- needApproval(u=>{window._pkOv={id:o.id,by:u.id};log("pickup by other approved","#"+(S.visits.find(x=>x.id===o.id)||{}).rno);save();checkoutModal(o.id,o.ts)},()=>checkoutModal(o.id,o.ts));
+ needApproval(u=>{window._pkOv={id:o.id,by:u.id};log("pickup by other approved","#"+(S.visits.find(x=>x.id===o.id)||{}).rno);save();o.group?checkoutGroupModal(o.group,o.ts):checkoutModal(o.id,o.ts)},()=>o.group?checkoutGroupModal(o.group,o.ts):checkoutModal(o.id,o.ts));
 }
 
 /* ---- inventory ---- */
@@ -1727,7 +1794,7 @@ Object.assign(D,{
  expNeedNote:["اكتب بيان المصروف","Enter a description"],expClosedShift:["الوردية مغلقة؛ يلغيه مدير العمليات فقط","Shift is closed; only the operations manager can cancel it"],
  expShift:["مصروفات الوردية (من الدرج)","Shift expenses (from drawer)"],rp_exp:["المصروفات","Expenses"],rpExpCat:["حسب الفئة","By category"],rpExpDay:["حسب اليوم","By day"],rpExpList:["تفاصيل المصروفات","Expense details"],
  ec_clean:["نظافة","Cleaning"],ec_maint:["صيانة","Maintenance"],ec_hosp:["ضيافة","Hospitality"],ec_supplies:["مستلزمات","Supplies"],ec_transport:["مواصلات","Transport"],ec_labor:["عمالة يومية","Daily labor"],ec_other:["أخرى","Other"],
- userDel:["حذف","Delete"],hideOut:["إخفاء النافد","Hide out of stock"],showOut:["إظهار النافد","Show out of stock"],del:["حذف","Delete"],prodDelHas:["لا يمكن حذف منتج بيع من قبل — عطّله بدل الحذف (إلغاء تفعيل)","A product that was sold can't be deleted — deactivate it instead"],prodDelConf:["حذف هذا المنتج نهائيًا؟","Delete this product permanently?"],prodDeleted:["تم حذف المنتج","Product deleted"],userDelHas:["للمستخدم سجلات (فواتير أو ورديات أو مصروفات). عطّله بدل حذفه","This user has records. Deactivate instead of deleting"],userDelConf:["حذف المستخدم نهائيًا؟","Delete this user permanently?"],
+ userDel:["حذف","Delete"],grpExit:["خروج الأطفال معًا","Check out together"],grpTitle:["خروج الأطفال معًا","Group check-out"],grpTotal:["الإجمالي للجميع","Total for all"],hideOut:["إخفاء النافد","Hide out of stock"],showOut:["إظهار النافد","Show out of stock"],del:["حذف","Delete"],prodDelHas:["لا يمكن حذف منتج بيع من قبل — عطّله بدل الحذف (إلغاء تفعيل)","A product that was sold can't be deleted — deactivate it instead"],prodDelConf:["حذف هذا المنتج نهائيًا؟","Delete this product permanently?"],prodDeleted:["تم حذف المنتج","Product deleted"],userDelHas:["للمستخدم سجلات (فواتير أو ورديات أو مصروفات). عطّله بدل حذفه","This user has records. Deactivate instead of deleting"],userDelConf:["حذف المستخدم نهائيًا؟","Delete this user permanently?"],
  userDelLast:["لا يمكن حذف آخر حساب إدارة","Cannot delete the last management account"],userDelSelf:["لا يمكنك حذف حسابك أنت","You cannot delete your own account"],userDeleted:["تم حذف المستخدم","User deleted"]
 });
 const EXP_CATS=["clean","maint","hosp","supplies","transport","labor","other"];
