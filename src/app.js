@@ -268,7 +268,7 @@ function render(){
 }
 function renderLogin(){
  const act=S.users.filter(u=>u.active);
- $("#app").innerHTML='<div class="login card"><h2>'+t("appName")+'</h2><label>'+t("user")+'<select id="lu">'+act.map(u=>'<option value="'+u.id+'">'+esc(u.name)+" – "+t(ROLES[u.role])+"</option>").join("")+'</select></label><label>'+t("pin")+'<input id="lp" type="password" inputmode="numeric" maxlength="4" onkeydown="if(event.key===\'Enter\')doLogin()"></label><button class="btn pri big" onclick="doLogin()">'+t("enter")+'</button><p class="muted">'+t("demoHint")+'</p><div class="row"><button class="btn sm" onclick="setLang(\''+(lang==="ar"?"en":"ar")+'\')">'+(lang==="ar"?"English":"عربي")+"</button></div></div>";
+ $("#app").innerHTML='<div class="login card"><h2>'+t("appName")+'</h2><label>'+t("user")+'<select id="lu">'+act.map(u=>'<option value="'+u.id+'">'+esc(u.name)+" – "+t(ROLES[u.role])+"</option>").join("")+'</select></label><label>'+t("pin")+'<input id="lp" type="password" inputmode="numeric" maxlength="4" onkeydown="if(event.key===\'Enter\')doLogin()"></label><button class="btn pri big" onclick="doLogin()">'+t("enter")+'</button>'+(demoPinsLeft()?'<p class="muted">'+t("demoHint")+'</p>':'')+'<div class="row"><button class="btn sm" onclick="setLang(\''+(lang==="ar"?"en":"ar")+'\')">'+(lang==="ar"?"English":"عربي")+"</button></div></div>";
 }
 function doLogin(){
  const u=S.users.find(x=>x.id===$("#lu").value&&x.active);
@@ -2037,6 +2037,17 @@ Object.assign(D,{
  lrWiped:["تم المسح. غيّر الرموز السرية وأدخل المخزون والموظفين","Cleared. Now change PINs and enter stock and employees"],
  lrNote:["بعد المسح: غيّر الرموز السرية من الإعدادات، وأدخل المخزون الفعلي والموظفين.","After clearing: change PINs in Settings, then enter real stock and employees."]
 });
+/* يظهر تلميح الأرقام التجريبية في شاشة الدخول فقط ما دام أي مستخدم فعّال ما زال برقم تجريبي */
+let _dpSig="",_dpVal=true;
+function demoPinsLeft(){
+ try{
+  const us=(DB.shared.users||[]).filter(u=>u.active);
+  const sig=us.map(u=>u.id+":"+(u.pin||"")+(u.pinHash||"")+(u.pinSalt||"")).join("|");
+  if(sig===_dpSig)return _dpVal;
+  _dpSig=sig;_dpVal=us.some(u=>["1111","2222","3333","4444","5555","6666"].some(p=>pinOk(u,p)));
+  return _dpVal;
+ }catch(e){return true}
+}
 function lrChecks(){
  const demoPins=["1111","2222","3333","4444","5555","6666"];
  const pins=(DB.shared.users||[]).filter(u=>u.active&&demoPins.some(p=>pinOk(u,p))).length;
