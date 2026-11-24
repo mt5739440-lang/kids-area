@@ -90,6 +90,7 @@ const PERMS={
  ops:["entry","checkout","late","guardians","history","pos","shift","invoices","approve","discount","parties","partyPay","attendance","hr","settings","users","audit","report","maintain","inventory","reportShift","reports","branches"],
  admin:["entry","checkout","late","guardians","history","pos","shift","invoices","approve","discount","parties","partyPay","attendance","hr","settings","users","audit","reset","report","maintain","inventory","reportShift","reports","branches"]
 };
+Object.keys(PERMS).forEach(r=>PERMS[r].push("expense"));
 function mkVisit(s,cid,plan,ts,grp,rno,cashier,note){
  const c=s.children.find(x=>x.id===cid);
  return {id:uid(),no:++s.seq.visit,rno:rno,group:grp,childId:cid,guardianId:c.guardianId,planId:plan.id,planType:plan.type,planName:plan.name,
@@ -147,7 +148,7 @@ const SHARED=["guardians","children","subs","packages","coupons","couponUses","u
 function splitState(s){const sh={},br={};Object.keys(s).forEach(k=>{(SHARED.indexOf(k)>=0?sh:br)[k]=s[k]});return {sh:sh,br:br}}
 function blankBranchState(base,zeroStock){
  const s=JSON.parse(JSON.stringify(base));
- ["visits","audit","invoices","refunds","shifts","bookings","employees","attendance","leaves","penalties","advances","bonuses","faults","stockLog","taskDefs"].forEach(k=>{s[k]=(k==="attendance"?{}:[])});
+ ["visits","audit","invoices","refunds","shifts","bookings","employees","attendance","leaves","penalties","advances","bonuses","faults","stockLog","taskDefs","expenses"].forEach(k=>{s[k]=(k==="attendance"?{}:[])});
  ["roster","payrolls","taskLogs","evals","qcLogs","attendance"].forEach(k=>{s[k]={}});
  s.seq={visit:0,receipt:0,invoice:0,shift:0,booking:0,emp:0,fault:0};
  if(zeroStock)s.products.forEach(p=>{if(p.track)p.stock=0});
@@ -260,7 +261,7 @@ function render(){
  document.documentElement.lang=lang;document.documentElement.dir=lang==="ar"?"rtl":"ltr";
  document.title=S.settings.venue;
  if(!me){return renderLogin()}
- const items=[["present","present",true],["entry","newEntry",can("entry")],["pos","posTitle",can("pos")],["shift","shiftTitle",can("shift")],["invoices","invoices",can("invoices")],["parties","partiesTitle",can("parties")],["hr","hrTitle",can("attendance")||can("hr")],["inventory","invTitle",can("inventory")],["maint","maintTitle",can("report")],["reports","reportsTitle",can("reportShift")],["guardians","guardians",can("guardians")],["settings","settings",can("settings")||can("users")],["audit","audit",can("audit")]].filter(x=>x[2]);
+ const items=[["present","present",true],["entry","newEntry",can("entry")],["pos","posTitle",can("pos")],["shift","shiftTitle",can("shift")],["invoices","invoices",can("invoices")],["expenses","expTitle",can("expense")],["parties","partiesTitle",can("parties")],["hr","hrTitle",can("attendance")||can("hr")],["inventory","invTitle",can("inventory")],["maint","maintTitle",can("report")],["reports","reportsTitle",can("reportShift")],["guardians","guardians",can("guardians")],["settings","settings",can("settings")||can("users")],["audit","audit",can("audit")]].filter(x=>x[2]);
  if(!items.some(x=>x[0]===view))view="present";
  $("#app").innerHTML='<header><h1>'+esc(S.settings.venue)+(S.settings.branch?" – "+esc(S.settings.branch):"")+'</h1>'+branchBadge()+'<span class="who">'+esc(me.name)+" ("+t(ROLES[me.role])+')</span><button class="btn sm" onclick="setLang(\''+(lang==="ar"?"en":"ar")+'\')">'+(lang==="ar"?"English":"عربي")+'</button><button class="btn sm" onclick="logout()">'+t("logout")+'</button></header><nav>'+
   items.map(x=>'<button class="'+(view===x[0]?"on":"")+'" onclick="go(\''+x[0]+'\')">'+t(x[1])+"</button>").join("")+'</nav><main id="view"></main>';
@@ -489,7 +490,7 @@ function reprint(id){
 /* ============ users ============ */
 views.usersBody=function(){
  (window._hT||$("#view")).innerHTML='<div class="bar"><h2>'+t("users")+'</h2><button class="btn pri" onclick="userModal(\'\')">'+t("addUser")+'</button></div><div class="card"><table><thead><tr><th>'+t("name")+"</th><th>"+t("role")+"</th><th>"+t("userBranch")+"</th><th>"+t("active")+"</th><th></th></tr></thead><tbody>"+
- S.users.map(u=>"<tr><td>"+esc(u.name)+"</td><td>"+t(ROLES[u.role])+"</td><td>"+(u.branch==="all"?t("allBranches"):esc(branchName(u.branch)))+"</td><td>"+(u.active?"✔":"✘")+'</td><td><button class="btn sm" onclick="userModal(\''+u.id+"')\">"+t("edit")+"</button></td></tr>").join("")+"</tbody></table></div>";
+ S.users.map(u=>"<tr><td>"+esc(u.name)+"</td><td>"+t(ROLES[u.role])+"</td><td>"+(u.branch==="all"?t("allBranches"):esc(branchName(u.branch)))+"</td><td>"+(u.active?"✔":"✘")+'</td><td><button class="btn sm" onclick="userModal(\''+u.id+"')\">"+t("edit")+"</button>"+(can("users")&&u.id!==me.id&&!(u.role==="admin"&&me.role!=="admin")?' <button class="btn sm bad" onclick="userDelete(\''+u.id+"')\">"+t("userDel")+"</button>":"")+"</td></tr>").join("")+"</tbody></table></div>";
 };
 function userModal(id){
  const u=id?S.users.find(x=>x.id===id):null;
@@ -560,6 +561,7 @@ function defaultPartyPkgs(){return [
  {id:"pp2",name:{ar:"باقة مميزة",en:"Premium party"},perChild:220,includes:["بوفيه ضيافة","منظّم حفلة وألعاب","تزيين القاعة","ديكور بثيم الحفلة"],active:true}]}
 function partySettingsDefaults(){return {hallName:"قاعة الحفلات",partyBuffer:30,depositPct:30,partyTerms:"1) يتم تأكيد الحجز بسداد العربون.\n2) يُسدَّد المبلغ المتبقي قبل نهاية الحفلة أو حسب الاتفاق.\n3) أي زيادة في عدد الأطفال تُحاسَب بسعر الطفل حسب الباقة.\n4) يلتزم العميل بمواعيد الحجز المحددة."}}
 function migrate(s){
+ s.expenses=s.expenses||[];
  s.partyPkgs=s.partyPkgs||defaultPartyPkgs();s.bookings=s.bookings||[];s.seq.booking=s.seq.booking||0;
  s.employees=s.employees||[];s.roster=s.roster||{};s.attendance=s.attendance||{};s.leaves=s.leaves||[];s.penalties=s.penalties||[];s.advances=s.advances||[];s.bonuses=s.bonuses||[];s.faults=s.faults||[];s.users.forEach(u=>{if(u.branch===undefined)u.branch=(u.role==="ops"||u.role==="admin")?"all":"b1"});s.qcItems=s.qcItems||qcDefaults();s.qcLogs=s.qcLogs||{};s.stockLog=s.stockLog||[];s.seq=s.seq||{};s.seq.fault=s.seq.fault||0;s.payrolls=s.payrolls||{};s.taskDefs=s.taskDefs||[];s.taskLogs=s.taskLogs||{};s.evals=s.evals||{};s.seq.emp=s.seq.emp||0;
  const dflt=partySettingsDefaults();Object.keys(dflt).forEach(k=>{if(s.settings&&s.settings[k]===undefined)s.settings[k]=dflt[k]});
@@ -717,6 +719,7 @@ function posPay(){
 function shiftStats(sh){
  const z=()=>({cash:0,card:0,wallet:0}),net=z(),out=z();
  let sales=0,cnt=0,credit=0,disc=0,voids=0,voidAmt=0,refAmt=0,topups=0;
+ const expT=r2((S.expenses||[]).filter(x=>x.shift===sh.id&&!x.void).reduce((a,x)=>a+x.amount,0));
  S.invoices.forEach(i=>{
   i.payments.forEach(p=>{if(p.shift===sh.id)net[p.m]=(net[p.m]||0)+p.a});
   if(i.shift===sh.id&&!i.void){cnt++;sales+=invRevenue(i);topups+=invTopup(i);credit+=i.creditAmt;disc+=i.disc.amount}
@@ -724,7 +727,7 @@ function shiftStats(sh){
  });
  S.refunds.filter(r=>r.shift===sh.id).forEach(r=>{out[r.m]=(out[r.m]||0)+r.a;refAmt+=r.a});
  Object.keys(net).forEach(m=>{net[m]=r2(net[m]-(out[m]||0))});
- return {net:net,sales:r2(sales),cnt:cnt,credit:r2(credit),disc:r2(disc),voids:voids,voidAmt:r2(voidAmt),refAmt:r2(refAmt),topups:r2(topups),expected:r2(sh.openingCash+net.cash)};
+ return {net:net,sales:r2(sales),cnt:cnt,credit:r2(credit),disc:r2(disc),voids:voids,voidAmt:r2(voidAmt),refAmt:r2(refAmt),topups:r2(topups),exp:expT,expected:r2(sh.openingCash+net.cash-expT)};
 }
 views.shift=function(){
  const sh=curShift();let h="<h2>"+t("shiftTitle")+"</h2>";
@@ -733,7 +736,7 @@ views.shift=function(){
  }else{
   const st=shiftStats(sh),u=S.users.find(x=>x.id===sh.userId);
   h+='<div class="card"><div class="bar"><h3>'+t("shiftOpen")+" #"+sh.no+'</h3><span class="muted">'+esc(u?u.name:"")+" • "+fTime(sh.openedAt)+'</span></div><div class="kpis">'+
-   kpi(t("openingCash"),money(sh.openingCash))+kpi(mLabel("cash"),money(st.net.cash))+kpi(mLabel("card"),money(st.net.card))+kpi(mLabel("wallet"),money(st.net.wallet))+kpi(mLabel("credit"),money(st.credit))+kpi(t("invoicesN"),st.cnt)+kpi(t("discounts"),money(st.disc))+kpi(t("refunds"),money(st.refAmt+st.voidAmt))+
+   kpi(t("openingCash"),money(sh.openingCash))+kpi(mLabel("cash"),money(st.net.cash))+kpi(mLabel("card"),money(st.net.card))+kpi(mLabel("wallet"),money(st.net.wallet))+kpi(mLabel("credit"),money(st.credit))+kpi(t("invoicesN"),st.cnt)+kpi(t("discounts"),money(st.disc))+kpi(t("refunds"),money(st.refAmt+st.voidAmt))+kpi(t("expShift"),money(st.exp))+
    '</div><div class="kpi">'+t("expectedCash")+"<b>"+money(st.expected)+'</b></div><h4>'+t("closeShift")+'</h4><label>'+t("countedCash")+'<input id="cc" type="number" min="0" step="0.5" oninput="shiftDiff()"></label><div id="sdiff" class="line"></div><label>'+t("notes")+'<input id="cnote3"></label><label class="opt"><input type="checkbox" id="csp" checked><span>'+t("printShiftReport")+'</span></label><button class="btn bad" onclick="closeShift()">'+t("closeShift")+"</button></div>";
  }
  const past=S.shifts.filter(s=>s.status==="closed").sort((a,b)=>b.no-a.no).slice(0,10);
@@ -769,7 +772,7 @@ function shiftReport(sh){
  let h="<h1>"+esc(S.settings.venue)+"</h1>"+(S.settings.branch?'<div class="c">'+esc(S.settings.branch)+"</div>":"")+"<h2>"+t("shiftReport")+" #"+sh.no+"</h2><hr>"+
   rw(t("cashier"),u?u.name:"")+rw(t("openedAt"),fDate(sh.openedAt)+" "+fTime(sh.openedAt))+(sh.closedAt?rw(t("closedAt"),fDate(sh.closedAt)+" "+fTime(sh.closedAt)):"")+"<hr>"+
   rw(t("openingCash"),money(sh.openingCash))+rw(mLabel("cash"),money(st.net.cash))+rw(mLabel("card"),money(st.net.card))+rw(mLabel("wallet"),money(st.net.wallet))+rw(mLabel("credit"),money(st.credit))+"<hr>"+
-  rw(t("invoicesN"),String(st.cnt))+rw(t("sales"),money(st.sales))+rw(t("discounts"),money(st.disc))+rw(t("refunds"),money(st.refAmt))+rw(t("voidedN"),st.voids+" / "+money(st.voidAmt))+"<hr>"+
+  rw(t("invoicesN"),String(st.cnt))+rw(t("sales"),money(st.sales))+rw(t("discounts"),money(st.disc))+rw(t("refunds"),money(st.refAmt))+rw(t("voidedN"),st.voids+" / "+money(st.voidAmt))+rw(t("expShift"),money(st.exp))+"<hr>"+
   rw(t("expectedCash"),money(exp),true);
  if(sh.status==="closed")h+=rw(t("countedCash"),money(sh.counted),true)+rw(t("diff"),diffText(sh.diff),true)+(sh.note?'<div class="c">'+esc(sh.note)+"</div>":"");
  return h;
@@ -1706,7 +1709,78 @@ RT.gc=function(a,b){
  return {html:kp+rptTable(sh),sheets:[sh],pdf:kp+rptTable(sh)};
 };
 RT.history=function(){return {html:'<div id="hhost"></div>',host:true}};
-const RTABS=[["dash","reports","rp_dash"],["sales","reports","rp_sales"],["visits","reports","rp_visits"],["pp","reports","rp_pp"],["top","reports","rp_top"],["qc","reports","rp_qc"],["hrinv","reports","rp_hrinv"],["branches","branches","rp_branches"],["history","history","rp_history"],["shifts","reportShift","rp_shifts"]];
+/* ============ Daily expenses (cash drawer) ============ */
+Object.assign(D,{
+ expTitle:["المصروفات","Expenses"],expAdd:["تسجيل مصروف","Add expense"],expCat:["الفئة","Category"],expAmount:["المبلغ","Amount"],expNote:["البيان / ملاحظة","Description / note"],
+ expDay:["مصروفات اليوم","Expenses of the day"],expTotal:["إجمالي المصروفات","Total expenses"],expVoid:["إلغاء","Cancel"],expVoided:["ملغي","Cancelled"],expVoidTitle:["إلغاء مصروف","Cancel expense"],
+ expVoidReason:["سبب الإلغاء","Reason"],expVoidDo:["تأكيد الإلغاء","Confirm cancel"],expNoShift:["افتح وردية أولًا لتسجيل مصروف نقدي من الدرج","Open a shift first to record a cash expense"],
+ expOver:["المبلغ أكبر من النقدية المتوقعة في الدرج. متابعة؟","Amount exceeds expected cash in the drawer. Continue?"],expBad:["اكتب مبلغًا صحيحًا واختر الفئة","Enter a valid amount and choose a category"],
+ expNeedNote:["اكتب بيان المصروف","Enter a description"],expClosedShift:["الوردية مغلقة؛ يلغيه مدير العمليات فقط","Shift is closed; only the operations manager can cancel it"],
+ expShift:["مصروفات الوردية (من الدرج)","Shift expenses (from drawer)"],rp_exp:["المصروفات","Expenses"],rpExpCat:["حسب الفئة","By category"],rpExpDay:["حسب اليوم","By day"],rpExpList:["تفاصيل المصروفات","Expense details"],
+ ec_clean:["نظافة","Cleaning"],ec_maint:["صيانة","Maintenance"],ec_hosp:["ضيافة","Hospitality"],ec_supplies:["مستلزمات","Supplies"],ec_transport:["مواصلات","Transport"],ec_labor:["عمالة يومية","Daily labor"],ec_other:["أخرى","Other"],
+ userDel:["حذف","Delete"],userDelHas:["للمستخدم سجلات (فواتير أو ورديات أو مصروفات). عطّله بدل حذفه","This user has records. Deactivate instead of deleting"],userDelConf:["حذف المستخدم نهائيًا؟","Delete this user permanently?"],
+ userDelLast:["لا يمكن حذف آخر حساب إدارة","Cannot delete the last management account"],userDelSelf:["لا يمكنك حذف حسابك أنت","You cannot delete your own account"],userDeleted:["تم حذف المستخدم","User deleted"]
+});
+const EXP_CATS=["clean","maint","hosp","supplies","transport","labor","other"];
+let exDay=null;
+views.expenses=function(){
+ if(!exDay)exDay=dayKey(Date.now());
+ const today=dayKey(Date.now()),sh=curShift(),list=(S.expenses||[]).filter(x=>dayKey(x.at)===exDay).sort((a,b)=>b.at-a.at);
+ const tot=r2(list.filter(x=>!x.void).reduce((s,x)=>s+x.amount,0));
+ const form=exDay!==today?"":(sh?'<div class="card"><h3>'+t("expAdd")+'</h3><div class="grid2" style="gap:8px"><label>'+t("expCat")+'<select id="xc">'+EXP_CATS.map(c=>'<option value="'+c+'">'+t("ec_"+c)+"</option>").join("")+'</select></label><label>'+t("expAmount")+'<input id="xa" type="number" min="0" step="0.5" inputmode="decimal"></label></div><label>'+t("expNote")+'<input id="xn"></label><button class="btn pri" onclick="expAdd()">'+t("expAdd")+"</button></div>":'<div class="alertbox soon">'+t("expNoShift")+"</div>");
+ $("#view").innerHTML='<div class="bar"><h2>'+t("expTitle")+'</h2><input type="date" style="max-width:200px" value="'+exDay+'" onchange="exDay=this.value||exDay;render()"></div>'+form+
+  '<div class="card"><div class="bar"><h3>'+t("expDay")+'</h3><b>'+t("expTotal")+": "+money(tot)+'</b></div><table><thead><tr><th>'+t("time")+"</th><th>"+t("cashier")+"</th><th>"+t("expCat")+"</th><th>"+t("expNote")+"</th><th>"+t("expAmount")+"</th><th></th></tr></thead><tbody>"+
+  (list.length?list.map(x=>{const u=S.users.find(y=>y.id===x.userId);return "<tr"+(x.void?' style="opacity:.55"':"")+"><td>"+fTime(x.at)+"</td><td>"+esc(u?u.name:"")+"</td><td>"+t("ec_"+x.cat)+"</td><td>"+esc(x.note||"")+(x.void?'<div class="muted">'+t("expVoided")+": "+esc(x.void.reason||"")+"</div>":"")+"</td><td>"+money(x.amount)+"</td><td>"+(!x.void&&can("approve")?'<button class="btn sm" onclick="expVoidAsk(\''+x.id+"')\">"+t("expVoid")+"</button>":(x.void?'<span class="tag over">'+t("expVoided")+"</span>":""))+"</td></tr>"}).join(""):'<tr><td colspan="6" class="muted">'+t("none")+"</td></tr>")+"</tbody></table></div>";
+};
+function expAdd(){
+ if(!requireShift())return;
+ const sh=curShift(),a=r2(parseFloat(norm($("#xa").value))),cat=$("#xc").value,note=$("#xn").value.trim();
+ if(!(a>0)||EXP_CATS.indexOf(cat)<0){toast(t("expBad"));return}
+ if(!note){toast(t("expNeedNote"));return}
+ if(a>shiftStats(sh).expected&&!confirm(t("expOver")))return;
+ S.expenses=S.expenses||[];S.expenses.push({id:uid(),at:Date.now(),shift:sh.id,userId:me.id,cat:cat,amount:a,note:note});
+ log("expense",t("ec_"+cat)+" "+a+" – "+note);save();toast(t("saved"));render();
+}
+function expVoidAsk(id){
+ const x=(S.expenses||[]).find(y=>y.id===id);if(!x||x.void||!can("approve"))return;
+ const open=curShift();
+ if(!(open&&open.id===x.shift)&&!can("hr")){toast(t("expClosedShift"));return}
+ modal("<h3>"+t("expVoidTitle")+'</h3><div class="line"><span>'+t("ec_"+x.cat)+"</span><b>"+money(x.amount)+'</b></div><label>'+t("expVoidReason")+'<input id="xr"></label><div class="row"><button class="btn bad" onclick="expVoidDo(\''+id+"')\">"+t("expVoidDo")+'</button><button class="btn" onclick="closeModal()">'+t("cancel")+"</button></div>");
+}
+function expVoidDo(id){
+ const x=(S.expenses||[]).find(y=>y.id===id),r=$("#xr").value.trim();if(!x||x.void)return;
+ if(!r){toast(t("needReason"));return}
+ x.void={by:me.id,at:Date.now(),reason:r};log("void expense",t("ec_"+x.cat)+" "+x.amount+" – "+r);save();closeModal();render();
+}
+RT.exp=function(a,b){
+ const all=(S.expenses||[]).filter(x=>dayKey(x.at)>=a&&dayKey(x.at)<=b),ok=all.filter(x=>!x.void),tot=r2(ok.reduce((s,x)=>s+x.amount,0));
+ const byC={},byD={};ok.forEach(x=>{byC[x.cat]=r2((byC[x.cat]||0)+x.amount);const d=dayKey(x.at);byD[d]=r2((byD[d]||0)+x.amount)});
+ const sh=[
+  {name:t("rpExpCat"),title:t("rpExpCat"),head:[t("expCat"),t("expAmount")],rows:EXP_CATS.filter(c=>byC[c]).map(c=>[t("ec_"+c),byC[c]]).concat([[t("rpTotal"),tot]]),total:true},
+  {name:t("rpExpDay"),title:t("rpExpDay"),head:[t("rpDate"),t("expAmount")],rows:Object.keys(byD).sort().map(d=>[d,byD[d]]).concat([[t("rpTotal"),tot]]),total:true},
+  {name:t("rpExpList"),title:t("rpExpList"),head:[t("rpDate"),t("time"),t("rpUser"),t("expCat"),t("expNote"),t("expAmount"),t("status")],rows:all.sort((x,y)=>x.at-y.at).map(x=>{const u=S.users.find(y=>y.id===x.userId);return [dayKey(x.at),fTime(x.at),u?u.name:"",t("ec_"+x.cat),x.note||"",x.amount,x.void?t("expVoided")+": "+(x.void.reason||""):""]})}
+ ];
+ return {html:sh.map(rptTable).join(""),sheets:sh,pdf:sh.map(rptTable).join("")};
+};
+/* ---- delete user (only when there are no records tied to them) ---- */
+function userRefs(id){
+ syncOut();let n=0;
+ DB.branches.forEach(b=>{const s=DB.byBranch[b.id]||{};
+  n+=(s.invoices||[]).filter(i=>i.cashier===id).length+(s.visits||[]).filter(v=>v.cashier===id).length+(s.shifts||[]).filter(x=>x.userId===id||x.closedBy===id).length+(s.expenses||[]).filter(x=>x.userId===id).length});
+ return n;
+}
+function userDelete(id){
+ if(!can("users"))return;
+ const u=S.users.find(x=>x.id===id);if(!u)return;
+ if(u.id===me.id){toast(t("userDelSelf"));return}
+ if(u.role==="admin"&&me.role!=="admin"){toast("—");return}
+ const mgmt=x=>x.active&&(x.role==="ops"||x.role==="admin");
+ if(mgmt(u)&&!S.users.some(x=>x.id!==u.id&&mgmt(x))){toast(t("userDelLast"));return}
+ if(userRefs(id)>0){toast(t("userDelHas"));return}
+ if(!confirm(t("userDelConf")+"\n"+u.name))return;
+ S.users.splice(S.users.indexOf(u),1);log("delete user",u.name+" ("+u.role+")");save();toast(t("userDeleted"));render();
+}
+const RTABS=[["dash","reports","rp_dash"],["sales","reports","rp_sales"],["visits","reports","rp_visits"],["pp","reports","rp_pp"],["top","reports","rp_top"],["qc","reports","rp_qc"],["hrinv","reports","rp_hrinv"],["branches","branches","rp_branches"],["history","history","rp_history"],["shifts","reportShift","rp_shifts"],["exp","reports","rp_exp"]];
 function repPreset(p){
  const td=dayKey(Date.now());
  if(p==="today")R.from=R.to=td;
