@@ -688,16 +688,17 @@ function receiptInvoice(inv){
 }
 
 /* ---- POS (cafeteria & extra games) ---- */
-let K={cat:"all",cart:[],gid:null,ov:{}};
+let K={cat:"all",cart:[],gid:null,ov:{},showOut:false};
 views.pos=function(){posRender()};
 function posRender(){
  const cats=[["all","catAll"],["cafe","catCafe"],["game","catGame"]];
- const items=S.products.filter(p=>p.active&&(K.cat==="all"||p.cat===K.cat));
+ const outN=S.products.filter(p=>p.active&&tracked(p)&&stockOf(p)<=0).length;
+ const items=S.products.filter(p=>p.active&&(K.cat==="all"||p.cat===K.cat)&&(K.showOut||!tracked(p)||stockOf(p)>0));
  let total=0;
  const cart=K.cart.map(c=>{const p=S.products.find(x=>x.id===c.id);if(!p)return "";total+=p.price*c.qty;
   return '<div class="line"><span>'+esc(pname(p))+'</span><span><button class="btn sm" onclick="cartQty(\''+c.id+'\',-1)">−</button> <b>'+c.qty+'</b> <button class="btn sm" onclick="cartQty(\''+c.id+'\',1)">+</button> '+money(p.price*c.qty)+"</span></div>"}).join("");
  const gl=K.gid?'<div class="line"><span>'+esc(G(K.gid).name)+'</span><button class="btn sm" onclick="K.gid=null;posRender()">✕</button></div>'+acctLine(K.gid):'<button class="btn sm" onclick="gpModal(id=>{K.gid=id;posRender()})">'+t("linkGuardian")+"</button>";
- $("#view").innerHTML="<h2>"+t("posTitle")+'</h2><div class="grid2"><div class="card"><div class="row" style="margin:0 0 10px">'+cats.map(c=>'<button class="btn sm '+(K.cat===c[0]?"pri":"")+'" onclick="K.cat=\''+c[0]+'\';posRender()">'+t(c[1])+"</button>").join("")+'</div><div class="pgrid">'+
+ $("#view").innerHTML="<h2>"+t("posTitle")+'</h2><div class="grid2"><div class="card"><div class="row" style="margin:0 0 10px">'+cats.map(c=>'<button class="btn sm '+(K.cat===c[0]?"pri":"")+'" onclick="K.cat=\''+c[0]+'\';posRender()">'+t(c[1])+"</button>").join("")+(outN?'<button class="btn sm '+(K.showOut?"pri":"")+'" onclick="K.showOut=!K.showOut;posRender()">'+(K.showOut?t("hideOut"):t("showOut")+" ("+outN+")")+"</button>":"")+'</div><div class="pgrid">'+
   items.map(p=>'<button class="pbtn" onclick="cartAdd(\''+p.id+'\')"><b>'+esc(pname(p))+"</b><span>"+money(p.price)+"</span></button>").join("")+'</div></div><div class="card"><h3>'+t("cart")+"</h3>"+gl+"<hr>"+(cart||'<div class="muted">'+t("cartEmpty")+"</div>")+
   '<div class="line"><span>'+t("total")+'</span><span class="tot">'+money(total)+'</span></div><div class="row"><button class="btn ok big" onclick="posPay()">'+t("pay")+'</button><button class="btn" onclick="K.cart=[];K.ov={};K.gid=null;posRender()">'+t("clear")+"</button></div></div></div>";
 }
@@ -850,7 +851,15 @@ function refundDo(){
 /* ---- product catalog (settings) ---- */
 function productsCard(){
  return '<div class="card"><div class="bar"><h3>'+t("products")+'</h3><button class="btn sm pri" onclick="productModal(\'\')">'+t("addProduct")+'</button></div><table><thead><tr><th>'+t("name")+"</th><th>"+t("category")+"</th><th>"+t("price")+"</th><th>"+t("active")+"</th><th></th></tr></thead><tbody>"+
- S.products.map(p=>"<tr><td>"+esc(pname(p))+"</td><td>"+t(p.cat==="game"?"catGame":"catCafe")+"</td><td>"+money(p.price)+"</td><td>"+(p.active?"✔":"✘")+'</td><td><button class="btn sm" onclick="productModal(\''+p.id+"')\">"+t("edit")+"</button></td></tr>").join("")+"</tbody></table></div>";
+ S.products.map(p=>"<tr><td>"+esc(pname(p))+"</td><td>"+t(p.cat==="game"?"catGame":"catCafe")+"</td><td>"+money(p.price)+"</td><td>"+(p.active?"✔":"✘")+'</td><td><button class="btn sm" onclick="productModal(\''+p.id+"')\">"+t("edit")+"</button> <button class=\"btn sm bad\" onclick=\"productDelete(\'"+p.id+"\')\">"+t("del")+"</button></td></tr>").join("")+"</tbody></table></div>";
+}
+function productDelete(id){
+ if(!can("settings"))return;
+ const p=S.products.find(x=>x.id===id);if(!p)return;
+ if(S.invoices.some(i=>(i.lines||[]).some(l=>l.pid===id))){toast(t("prodDelHas"));return}
+ if(!confirm(t("prodDelConf")+"\n"+pname(p)))return;
+ S.products.splice(S.products.indexOf(p),1);K.cart=K.cart.filter(c=>c.id!==id);delete K.ov[id];
+ log("delete product",pname(p));save();toast(t("prodDeleted"));render();
 }
 function productModal(id){
  const p=id?S.products.find(x=>x.id===id):null;
@@ -1454,7 +1463,7 @@ views.inventory=function(){
  const rows=S.products.map(p=>{
   const st=!tracked(p)?'<span class="muted">'+t("invUntracked")+"</span>":stockOf(p)<=0?'<span class="tag soon">'+t("invOut")+"</span>":isLow(p)?'<span class="tag soon">'+t("invLow")+"</span>":'<span class="tag ok">'+t("invOk")+"</span>";
   return "<tr><td><b>"+esc(pname(p))+"</b></td><td>"+(tracked(p)?stockOf(p):"–")+"</td><td>"+(tracked(p)?p.min||0:"–")+"</td><td>"+st+'</td><td>'+(tracked(p)?'<button class="btn sm" onclick="stockModal(\''+p.id+'\',\'in\')">'+t("invReceive")+'</button> <button class="btn sm" onclick="stockModal(\''+p.id+'\',\'adj\')">'+t("invCount")+"</button> ":"")+'<button class="btn sm" onclick="trackModal(\''+p.id+'\')">'+t("edit")+"</button></td></tr>"}).join("");
- const lg=S.stockLog.slice(-30).reverse().map(m=>{const p=S.products.find(x=>x.id===m.pid);return "<tr><td>"+fTime(m.at)+"</td><td>"+esc(p?pname(p):"?")+"</td><td>"+t(MV[m.type]||"invAdj")+" "+esc(m.ref||"")+'</td><td dir="ltr">'+(m.d>0?"+":"")+m.d+"</td><td>"+m.after+"</td><td>"+esc(m.note||"")+"</td></tr>"}).join("");
+ const lg=S.stockLog.slice(-30).reverse().map(m=>{const p=S.products.find(x=>x.id===m.pid);return "<tr><td>"+fTime(m.at)+"</td><td>"+esc(p?pname(p):"("+t("prodDeleted")+")")+"</td><td>"+t(MV[m.type]||"invAdj")+" "+esc(m.ref||"")+'</td><td dir="ltr">'+(m.d>0?"+":"")+m.d+"</td><td>"+m.after+"</td><td>"+esc(m.note||"")+"</td></tr>"}).join("");
  $("#view").innerHTML='<div class="bar"><h2>'+t("invTitle")+'</h2></div><div class="card"><table><thead><tr><th>'+t("name")+"</th><th>"+t("invStock")+"</th><th>"+t("invMin")+"</th><th>"+t("status")+"</th><th></th></tr></thead><tbody>"+rows+'</tbody></table></div><div class="card"><h3>'+t("invLog")+"</h3><table><thead><tr><th>"+t("time")+"</th><th>"+t("name")+"</th><th></th><th>±</th><th>"+t("invStock")+"</th><th>"+t("invNote")+"</th></tr></thead><tbody>"+(lg||'<tr><td colspan="6" class="muted">'+t("none")+"</td></tr>")+"</tbody></table></div>";
 };
 function trackModal(id){
@@ -1718,7 +1727,7 @@ Object.assign(D,{
  expNeedNote:["اكتب بيان المصروف","Enter a description"],expClosedShift:["الوردية مغلقة؛ يلغيه مدير العمليات فقط","Shift is closed; only the operations manager can cancel it"],
  expShift:["مصروفات الوردية (من الدرج)","Shift expenses (from drawer)"],rp_exp:["المصروفات","Expenses"],rpExpCat:["حسب الفئة","By category"],rpExpDay:["حسب اليوم","By day"],rpExpList:["تفاصيل المصروفات","Expense details"],
  ec_clean:["نظافة","Cleaning"],ec_maint:["صيانة","Maintenance"],ec_hosp:["ضيافة","Hospitality"],ec_supplies:["مستلزمات","Supplies"],ec_transport:["مواصلات","Transport"],ec_labor:["عمالة يومية","Daily labor"],ec_other:["أخرى","Other"],
- userDel:["حذف","Delete"],userDelHas:["للمستخدم سجلات (فواتير أو ورديات أو مصروفات). عطّله بدل حذفه","This user has records. Deactivate instead of deleting"],userDelConf:["حذف المستخدم نهائيًا؟","Delete this user permanently?"],
+ userDel:["حذف","Delete"],hideOut:["إخفاء النافد","Hide out of stock"],showOut:["إظهار النافد","Show out of stock"],del:["حذف","Delete"],prodDelHas:["لا يمكن حذف منتج بيع من قبل — عطّله بدل الحذف (إلغاء تفعيل)","A product that was sold can't be deleted — deactivate it instead"],prodDelConf:["حذف هذا المنتج نهائيًا؟","Delete this product permanently?"],prodDeleted:["تم حذف المنتج","Product deleted"],userDelHas:["للمستخدم سجلات (فواتير أو ورديات أو مصروفات). عطّله بدل حذفه","This user has records. Deactivate instead of deleting"],userDelConf:["حذف المستخدم نهائيًا؟","Delete this user permanently?"],
  userDelLast:["لا يمكن حذف آخر حساب إدارة","Cannot delete the last management account"],userDelSelf:["لا يمكنك حذف حسابك أنت","You cannot delete your own account"],userDeleted:["تم حذف المستخدم","User deleted"]
 });
 const EXP_CATS=["clean","maint","hosp","supplies","transport","labor","other"];
@@ -2166,7 +2175,7 @@ Object.assign(D,{
  imTitle:["استيراد العملاء من النظام القديم","Import customers from the old system"],
  imHelp:["اختر ملف Excel (xlsx) أو CSV يحتوي أولياء الأمور والأطفال. الأعمدة: اسم ولي الأمر، الموبايل، اسم الطفل، العمر، ملاحظات. صف لكل طفل، وولي الأمر يتكرر باسمه ورقمه.","Choose an Excel (xlsx) or CSV file with guardians and children. One row per child; repeat the guardian name and phone."],
  imFile:["اختيار ملف","Choose file"],imTpl:["تحميل نموذج الملف","Download template"],
- imMap:["مطابقة الأعمدة","Column mapping"],imGName:["اسم ولي الأمر","Guardian name"],imGPhone:["الموبايل","Phone"],imCName:["اسم الطفل (الأول)","Child name (first)"],imCName2:["اسم الطفل الثاني (اختياري)","Second child (optional)"],imCAge:["العمر","Age"],imNotes:["ملاحظات","Notes"],imNone:["— بدون —","— none —"],
+ imMap:["مطابقة الأعمدة","Column mapping"],imGName:["اسم ولي الأمر","Guardian name"],imGPhone:["الموبايل","Phone"],imGPhone2:["رقم آخر (اختياري)","Other number (optional)"],imCName:["اسم الطفل (الأول)","Child name (first)"],imCName2:["اسم الطفل الثاني (اختياري)","Second child (optional)"],imCAge:["العمر","Age"],imNotes:["ملاحظات","Notes"],imNone:["— بدون —","— none —"],
  imRows:["صفوف في الملف","Rows in file"],imNewG:["أولياء أمور جدد","New guardians"],imNewC:["أطفال جدد","New children"],imDupG:["أولياء أمور موجودون (تُضاف لهم أطفال جدد فقط)","Existing guardians (only new children added)"],imDupC:["أطفال مكررون (يُتجاهلون)","Duplicate children (skipped)"],imBad:["صفوف مرفوضة (رقم أو اسم غير صالح)","Rejected rows (bad phone or name)"],imNoAge:["أطفال بلا عمر صالح (يُسجّل 0)","Children without valid age (saved as 0)"],
  imGo:["استيراد الآن","Import now"],imDone:["تم الاستيراد","Import done"],imEmpty:["لا توجد بيانات في الملف","No data in file"],imErr:["تعذّرت قراءة الملف","Could not read the file"],imNeed:["حدّد عمودي ولي الأمر والموبايل على الأقل","Map at least guardian name and phone"]
 });
@@ -2221,13 +2230,14 @@ function imCsv(text){
  return rows;
 }
 function imDecode(buf){try{return new TextDecoder("utf-8",{fatal:true}).decode(buf)}catch(e){try{return new TextDecoder("windows-1256").decode(buf)}catch(e2){return new TextDecoder().decode(buf)}}}
-const IM_SYN={g:["الاسم","الاسم الكامل","name","full name","اسم ولي الامر","اسم ولي الأمر","ولي الامر","ولي الأمر","اسم العميل","العميل","guardian","parent","customer","client"],p:["الموبايل","موبايل","التليفون","تليفون","الهاتف","هاتف","رقم الهاتف","رقم الموبايل","phone","mobile","tel"],c:["الطفل الاول","طفل 1","اسم الطفل","الطفل","child","child 1","kid"],c2:["الطفل الثاني","الطفل الثانى","طفل 2","child 2"],a:["العمر","السن","age"],n:["ملاحظات","ملاحظة","notes","note"]};
+const IM_SYN={g:["الاسم","الاسم الكامل","name","full name","اسم ولي الامر","اسم ولي الأمر","ولي الامر","ولي الأمر","اسم العميل","العميل","guardian","parent","customer","client"],p:["الموبايل","موبايل","التليفون","تليفون","الهاتف","هاتف","رقم الهاتف","رقم الموبايل","phone","mobile","tel"],p2:["رقم اخر","رقم آخر","رقم تاني","رقم ثاني","رقم اضافي","رقم إضافي","ارقام اخرى","أرقام أخرى","موبايل 2","موبايل2","تليفون 2","تليفون2","هاتف 2","هاتف2","واتس","واتساب","whatsapp","phone 2","phone2","mobile 2","mobile2","other phone","other number"],c:["الطفل الاول","طفل 1","اسم الطفل","الطفل","child","child 1","kid"],c2:["الطفل الثاني","الطفل الثانى","طفل 2","child 2"],a:["العمر","السن","age"],n:["ملاحظات","ملاحظة","notes","note"]};
 function imGuess(head){
- const nm=s=>norm(String(s||"")).replace(/[\u0623\u0625\u0622]/g,"\u0627").replace(/\u0649/g,"\u064A").replace(/\s+/g," ").trim().toLowerCase(),res={g:-1,p:-1,c:-1,c2:-1,a:-1,n:-1};
+ const nm=s=>norm(String(s||"")).replace(/[\u0623\u0625\u0622]/g,"\u0627").replace(/\u0649/g,"\u064A").replace(/\s+/g," ").trim().toLowerCase(),res={g:-1,p:-1,p2:-1,c:-1,c2:-1,a:-1,n:-1};
  Object.keys(IM_SYN).forEach(k=>{
   const syn=IM_SYN[k].map(nm);let ix=head.findIndex(h=>syn.indexOf(nm(h))>=0);
   if(ix<0)ix=head.findIndex(h=>syn.some(s=>nm(h).indexOf(s)>=0&&nm(h).length<=s.length+6));
   res[k]=ix});
+ if(res.p>=0&&res.p===res.p2){const ex=IM_SYN.p.map(nm),j=head.findIndex((h,i)=>i!==res.p2&&ex.indexOf(nm(h))>=0);if(j>=0)res.p=j;else{res.p=res.p2;res.p2=-1}}
  if(res.g>=0&&res.g===res.c)res.c=-1;
  if(res.c>=0&&res.c===res.c2)res.c2=-1;
  return res;
@@ -2247,7 +2257,7 @@ function imPlan(){
  const gByPhone={};S.guardians.forEach(g=>phonesOf(g).forEach(p=>{gByPhone[p]=g}));
  const plan={rows:rows.length,newG:{},dupG:{},newC:0,dupC:0,bad:0,noAge:0,items:[]},seenKids={};
  rows.forEach(r=>{
-  const gname=String(r[m.g]||"").replace(/\s+/g," ").trim(),ph=imPhone(r[m.p]);
+  const gname=String(r[m.g]||"").replace(/\s+/g," ").trim(),ph=imPhone(String(r[m.p]||"")+(m.p2>=0?" / "+String(r[m.p2]||""):""));
   if(!gname||ph.bad){plan.bad++;return}
   const kids=imKids(r);
   const ex=gByPhone[ph.primary]||ph.more.map(p=>gByPhone[p]).filter(Boolean)[0]||null;
@@ -2271,7 +2281,7 @@ function imRender(){
  const head=IM.hasHead?IM.rows[0]:IM.rows[0].map((_,i)=>"#"+(i+1)),opt=sel=>'<option value="-1">'+t("imNone")+"</option>"+head.map((h,i)=>'<option value="'+i+'"'+(sel===i?" selected":"")+">"+esc(String(h||"#"+(i+1)))+"</option>").join("");
  const sel=(k,lab)=>'<label>'+t(lab)+'<select onchange="imSet(\''+k+'\',this.value)">'+opt(IM.map[k])+"</select></label>";
  const ready=IM.map.g>=0&&IM.map.p>=0,pl=ready?imPlan():null;IM.plan=pl;
- modal("<h3>"+t("imTitle")+'</h3><div class="muted">'+esc(IM.name)+"</div><h4>"+t("imMap")+'</h4><div class="grid2" style="gap:8px">'+sel("g","imGName")+sel("p","imGPhone")+sel("c","imCName")+sel("c2","imCName2")+sel("a","imCAge")+sel("n","imNotes")+"</div>"+
+ modal("<h3>"+t("imTitle")+'</h3><div class="muted">'+esc(IM.name)+"</div><h4>"+t("imMap")+'</h4><div class="grid2" style="gap:8px">'+sel("g","imGName")+sel("p","imGPhone")+sel("p2","imGPhone2")+sel("c","imCName")+sel("c2","imCName2")+sel("a","imCAge")+sel("n","imNotes")+"</div>"+
   (pl?'<div class="card"><div class="line"><span>'+t("imRows")+"</span><b>"+pl.rows+'</b></div><div class="line"><span>'+t("imNewG")+"</span><b>"+pl.nNewG+'</b></div><div class="line"><span>'+t("imNewC")+"</span><b>"+pl.newC+'</b></div><div class="line"><span>'+t("imDupG")+"</span><b>"+pl.nDupG+'</b></div><div class="line"><span>'+t("imDupC")+"</span><b>"+pl.dupC+'</b></div><div class="line"><span>'+t("imNoAge")+"</span><b>"+pl.noAge+'</b></div><div class="line"><span>'+t("imBad")+"</span><b>"+pl.bad+"</b></div></div>":'<div class="muted">'+t("imNeed")+"</div>")+
   '<div class="row"><button class="btn pri" '+(pl&&(pl.newC||pl.nNewG)?"":"disabled")+' onclick="imGo()">'+t("imGo")+'</button><button class="btn" onclick="closeModal()">'+t("cancel")+"</button></div>");
 }
@@ -2295,7 +2305,7 @@ async function imFile(inp){
   rows=rows.filter(r=>r&&r.some(x=>String(x||"").trim()!==""));
   if(!rows.length){toast(t("imEmpty"));inp.value="";return}
   const g=imGuess(rows[0]),hasHead=g.g>=0||g.p>=0;
-  IM={name:f.name,rows:rows,hasHead:hasHead,map:hasHead?g:{g:0,p:1,c:2,c2:-1,a:3,n:4}};
+  IM={name:f.name,rows:rows,hasHead:hasHead,map:hasHead?g:{g:0,p:1,p2:-1,c:2,c2:-1,a:3,n:4}};
   inp.value="";imRender();
  }catch(e){toast(t("imErr"));inp.value=""}
 }
