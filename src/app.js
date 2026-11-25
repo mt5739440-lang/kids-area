@@ -709,9 +709,11 @@ function saveUser(id){
  if(!keepPin&&S.users.some(x=>x.id!==id&&pinOk(x,pin))){toast(t("dupPin"));return}
  const role=$("#ur").value,act=$("#ua").checked,br=$("#ub").value;
  if((role==="cashier"||role==="supervisor")&&br==="all"){toast(t("needBranch"));return}
- if(id){const u=S.users.find(x=>x.id===id);u.name=name;if(!keepPin)pinSet(u,pin);u.role=role;u.branch=br;if(u.id!==me.id)u.active=act}
+ let chg="";
+ if(id){const u=S.users.find(x=>x.id===id),o={r:u.role,b:u.branch,a:u.active};u.name=name;if(!keepPin)pinSet(u,pin);u.role=role;u.branch=br;if(u.id!==me.id)u.active=act;
+  chg=(o.r!==u.role?" role "+o.r+"→"+u.role:"")+(o.b!==u.branch?" branch "+o.b+"→"+u.branch:"")+(o.a!==u.active?(u.active?" activated":" deactivated"):"")+(keepPin?"":" PIN changed")}
  else{const nu={id:uid(),name:name,role:role,active:act,branch:br};pinSet(nu,pin);S.users.push(nu)}
- log(id?"edit user":"new user",name+" ("+role+")");save();closeModal();render();
+ log(id?"edit user":"new user",name+" ("+role+")"+chg);save();closeModal();render();
 }
 
 /* ============ settings ============ */
