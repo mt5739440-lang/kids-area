@@ -5,7 +5,7 @@
 const D={
 appName:["نظام إدارة كيدز إيريا","Kids Area Management"],
 login:["تسجيل الدخول","Sign in"],user:["المستخدم","User"],pin:["الرقم السري (PIN)","PIN"],enter:["دخول","Sign in"],logout:["تسجيل الخروج","Log out"],
-wrongPin:["الرقم السري غير صحيح","Wrong PIN"],rights:["© 2026 SYSTEM KIDS AREA — جميع الحقوق محفوظة","© 2026 SYSTEM KIDS AREA — All rights reserved"],demoHint:["بيانات تجريبية للدخول: كاشير 1111 • مشرف 2222 • مدير عمليات 3333 • إدارة 4444","Demo logins: Cashier 1111 • Supervisor 2222 • Ops manager 3333 • Admin 4444"],
+wrongPin:["الرقم السري غير صحيح","Wrong PIN"],setupTitle:["إنشاء أول مدير","Create the first admin"],setupHint:["هذا أول تشغيل ولا يوجد أي مستخدم. أنشئ حساب المدير برقم سري من 4 أرقام تختاره أنت.","First run: no users exist. Create the admin account with a 4-digit PIN of your choice."],setupName:["اسم المدير","Admin name"],setupPin:["الرقم السري (4 أرقام)","PIN (4 digits)"],setupPin2:["أعد كتابة الرقم السري","Repeat PIN"],setupCreate:["إنشاء الحساب والدخول","Create account and sign in"],setupNoName:["اكتب اسم المدير","Enter the admin name"],setupPin4:["الرقم السري يجب أن يكون 4 أرقام","PIN must be 4 digits"],setupMismatch:["الرقمان غير متطابقين","PINs do not match"],setupWeak:["رقم سري ضعيف (مكرر أو متسلسل)، اختر غيره","Weak PIN (repeated or sequential), choose another"],setupJoin:["هذا جهاز فرع؟ اربطه بقاعدة البيانات المشتركة","Branch device? Connect to the shared database"],setupJoinHint:["بدل إنشاء مدير جديد، أدخل بيانات Supabase لسحب المستخدمين والبيانات الموجودة.","Instead of creating a new admin, enter the Supabase details to pull existing users and data."],setupJoinBtn:["ربط وسحب البيانات","Connect and pull data"],rights:["© 2026 SYSTEM KIDS AREA — جميع الحقوق محفوظة","© 2026 SYSTEM KIDS AREA — All rights reserved"],
 present:["الأطفال الموجودين الآن","Children inside now"],newEntry:["تسجيل دخول","New check-in"],history:["الزيارات والتقارير","Visits & reports"],
 guardians:["أولياء الأمور والأطفال","Guardians & children"],settings:["الإعدادات","Settings"],users:["المستخدمين","Users"],audit:["سجل التدقيق","Audit log"],
 searchHere:["ابحث بالاسم أو الموبايل أو رقم الإيصال","Search name, phone or receipt no."],
@@ -104,9 +104,7 @@ function seed(){
    plans:[{id:"p30",name:{ar:"نصف ساعة",en:"30 minutes"},type:"fixed",minutes:30,price:40},
           {id:"p60",name:{ar:"ساعة",en:"1 hour"},type:"fixed",minutes:60,price:70},
           {id:"open",name:{ar:"وقت مفتوح",en:"Open time"},type:"open",rate:35}]}),
-  users:[{id:"u1",name:"كاشير 1",pin:"1111",role:"cashier",active:true,branch:"b1"},{id:"u2",name:"مشرف الفرع",pin:"2222",role:"supervisor",active:true,branch:"b1"},
-         {id:"u3",name:"مدير العمليات",pin:"3333",role:"ops",active:true,branch:"all"},{id:"u4",name:"الإدارة العليا",pin:"4444",role:"admin",active:true,branch:"all"},
-         {id:"u5",name:"كاشير جليمنابوليس",pin:"5555",role:"cashier",active:true,branch:"b2"},{id:"u6",name:"مشرف جليمنابوليس",pin:"6666",role:"supervisor",active:true,branch:"b2"}],
+  users:(typeof window!=="undefined"&&Array.isArray(window.KA_TEST_USERS)?JSON.parse(JSON.stringify(window.KA_TEST_USERS)):[]),
   guardians:[{id:"g1",name:"أحمد محمود",phone:"01012345678",notes:""},{id:"g2",name:"سارة علي",phone:"01223456789",notes:""},{id:"g3",name:"محمد حسن",phone:"01112223334",notes:""}],
   children:[{id:"c1",guardianId:"g1",name:"يوسف",age:6,notes:""},{id:"c2",guardianId:"g1",name:"مريم",age:4,notes:"حساسية من المكسرات"},
             {id:"c3",guardianId:"g2",name:"ليلى",age:5,notes:""},{id:"c4",guardianId:"g3",name:"آدم",age:7,notes:""}],
@@ -282,7 +280,33 @@ function render(){
 }
 function renderLogin(){
  const act=S.users.filter(u=>u.active);
- $("#app").innerHTML='<div class="login card"><h2>'+t("appName")+'</h2><label>'+t("user")+'<select id="lu">'+act.map(u=>'<option value="'+u.id+'">'+esc(u.name)+" – "+t(ROLES[u.role])+"</option>").join("")+'</select></label><label>'+t("pin")+'<input id="lp" type="password" inputmode="numeric" maxlength="4" onkeydown="if(event.key===\'Enter\')doLogin()"></label><button class="btn pri big" onclick="doLogin()">'+t("enter")+'</button>'+(demoPinsLeft()?'<p class="muted">'+t("demoHint")+'</p>':'')+'<p class="muted" style="font-size:11px;text-align:center;margin-top:14px">'+t("rights")+'</p><div class="row"><button class="btn sm" onclick="setLang(\''+(lang==="ar"?"en":"ar")+'\')">'+(lang==="ar"?"English":"عربي")+"</button></div></div>";
+ if(!act.length)return renderSetup();
+ $("#app").innerHTML='<div class="login card"><h2>'+t("appName")+'</h2><label>'+t("user")+'<select id="lu">'+act.map(u=>'<option value="'+u.id+'">'+esc(u.name)+" – "+t(ROLES[u.role])+"</option>").join("")+'</select></label><label>'+t("pin")+'<input id="lp" type="password" inputmode="numeric" maxlength="4" onkeydown="if(event.key===\'Enter\')doLogin()"></label><button class="btn pri big" onclick="doLogin()">'+t("enter")+'</button>'+'<p class="muted" style="font-size:11px;text-align:center;margin-top:14px">'+t("rights")+'</p><div class="row"><button class="btn sm" onclick="setLang(\''+(lang==="ar"?"en":"ar")+'\')">'+(lang==="ar"?"English":"عربي")+"</button></div></div>";
+}
+/* ============ first run: create the first admin (no default PINs) ============ */
+function setupNeeded(){return !((S&&S.users)||[]).some(u=>u.active)}
+function pinWeak(p){return /^(\d)\1{3}$/.test(p)||["1234","4321","0123","3210","2345","5432","6789","9876"].includes(p)}
+function renderSetup(){
+ $("#app").innerHTML='<div class="login card"><h2>'+t("appName")+'</h2><h3>'+t("setupTitle")+'</h3><p class="muted">'+t("setupHint")+'</p>'+
+ '<label>'+t("setupName")+'<input id="sn" autocomplete="off"></label>'+
+ '<label>'+t("setupPin")+'<input id="sp" type="password" inputmode="numeric" maxlength="4" autocomplete="new-password"></label>'+
+ '<label>'+t("setupPin2")+'<input id="sp2" type="password" inputmode="numeric" maxlength="4" autocomplete="new-password" onkeydown="if(event.key===\'Enter\')setupAdmin()"></label>'+
+ '<button class="btn pri big" onclick="setupAdmin()">'+t("setupCreate")+'</button>'+
+ '<details style="margin-top:14px"><summary>'+t("setupJoin")+'</summary><p class="muted">'+t("setupJoinHint")+'</p>'+
+ '<label>'+t("syUrl")+'<input id="syu" dir="ltr" value="'+esc(SY.url)+'"></label><label>'+t("syKey")+'<input id="syk" dir="ltr" value="'+esc(SY.key)+'"></label>'+
+ '<label>'+t("syEmail")+'<input id="sye" dir="ltr" value="'+esc(SY.email)+'"></label><label>'+t("syPass")+'<input id="syp" type="password" dir="ltr"></label>'+
+ '<div class="muted" id="symsg"></div><button class="btn" onclick="syJoinDB()">'+t("setupJoinBtn")+'</button></details>'+
+ '<p class="muted" style="font-size:11px;text-align:center;margin-top:14px">'+t("rights")+'</p><div class="row"><button class="btn sm" onclick="setLang(\''+(lang==="ar"?"en":"ar")+'\')">'+(lang==="ar"?"English":"عربي")+"</button></div></div>";
+}
+function setupAdmin(){
+ if(!setupNeeded())return;
+ const name=($("#sn").value||"").trim(),p1=norm($("#sp").value),p2=norm($("#sp2").value);
+ if(!name){toast(t("setupNoName"));return}
+ if(!/^\d{4}$/.test(p1)){toast(t("setupPin4"));return}
+ if(p1!==p2){toast(t("setupMismatch"));return}
+ if(pinWeak(p1)){toast(t("setupWeak"));return}
+ const u={id:uid(),name:name,role:"admin",active:true,branch:"all"};pinSet(u,p1);S.users.push(u);
+ me=u;log("first admin created",name);bindBranch();try{sessionStorage.setItem("ls_user",u.id)}catch(e){}save();view="present";render();
 }
 function doLogin(){
  const u=S.users.find(x=>x.id===$("#lu").value&&x.active);
@@ -2177,14 +2201,20 @@ function syApply(rows){
  });
  return changed;
 }
+let SY_PAGE=1000;
 async function syPull(){
- let since=SY.lastPull?new Date(Date.parse(SY.lastPull)-10000).toISOString():"",changed=false,off=0,maxTs=SY.lastPull;
+ let since=SY.lastPull?new Date(Date.parse(SY.lastPull)-10000).toISOString():"",changed=false,cur=null,maxTs=SY.lastPull;
+ /* ترقيم بمؤشر (keyset/cursor): كل صفحة تبدأ بعد آخر صف (updated_at, collection, id) بدل offset، فلا يضيع صف ولا يتكرر لو تغيّرت البيانات أثناء السحب */
  for(;;){
-  const q="/rest/v1/docs?select=collection,id,branch_id,data,deleted,updated_at&order=updated_at.asc,collection.asc,id.asc&limit=1000&offset="+off+(since?"&updated_at=gte."+encodeURIComponent(since):"");
+  let q="/rest/v1/docs?select=collection,id,branch_id,data,deleted,updated_at&order=updated_at.asc,collection.asc,id.asc&limit="+SY_PAGE;
+  if(cur){const Q=v=>'"'+String(v).replace(/\\/g,"\\\\").replace(/"/g,'\\"')+'"';
+   q+="&or="+encodeURIComponent("(updated_at.gt."+Q(cur.ts)+",and(updated_at.eq."+Q(cur.ts)+",collection.gt."+Q(cur.c)+"),and(updated_at.eq."+Q(cur.ts)+",collection.eq."+Q(cur.c)+",id.gt."+Q(cur.id)+"))")}
+  else if(since)q+="&updated_at=gte."+encodeURIComponent(since);
   const r=await syReq("GET",q);if(!r.ok)throw r;const rows=r.json||[];
   if(syApply(rows))changed=true;
   rows.forEach(x=>{if(!maxTs||x.updated_at>maxTs)maxTs=x.updated_at});
-  if(rows.length<1000)break;off+=1000;
+  if(rows.length<SY_PAGE)break;
+  const L=rows[rows.length-1];cur={ts:L.updated_at,c:L.collection,id:L.id};
  }
  SY.lastPull=maxTs;
  if(changed){S=compose(CUR);migrate(S);if(me){const u=S.users.find(x=>x.id===me.id&&x.active);if(u)me=u}
@@ -2228,7 +2258,7 @@ async function syUpload(){
  SYHH={};SYQQ={};SY.lastPull="";SY.on=true;log("sync upload","");save();syDiff();sySave();await syRun();render();
 }
 async function syJoinDB(){
- if(!can("settings"))return;const f=syFields();if(!(await syCheck(f)))return;
+ if(!can("settings")&&!setupNeeded())return;const f=syFields();if(!(await syCheck(f)))return;
  if(!confirm(t("syConfJoin")))return;
  const keep=JSON.stringify(DB),qk=JSON.stringify(SYQQ),hk=JSON.stringify(SYHH);
  const wipe=o=>Object.keys(o).forEach(k=>{if(Array.isArray(o[k]))o[k]=[]});
@@ -2270,17 +2300,6 @@ Object.assign(D,{
  lrWiped:["تم المسح. غيّر الرموز السرية وأدخل المخزون والموظفين","Cleared. Now change PINs and enter stock and employees"],
  lrNote:["بعد المسح: غيّر الرموز السرية من الإعدادات، وأدخل المخزون الفعلي والموظفين.","After clearing: change PINs in Settings, then enter real stock and employees."]
 });
-/* يظهر تلميح الأرقام التجريبية في شاشة الدخول فقط ما دام أي مستخدم فعّال ما زال برقم تجريبي */
-let _dpSig="",_dpVal=true;
-function demoPinsLeft(){
- try{
-  const us=(DB.shared.users||[]).filter(u=>u.active);
-  const sig=us.map(u=>u.id+":"+(u.pin||"")+(u.pinHash||"")+(u.pinSalt||"")).join("|");
-  if(sig===_dpSig)return _dpVal;
-  _dpSig=sig;_dpVal=us.some(u=>["1111","2222","3333","4444","5555","6666"].some(p=>pinOk(u,p)));
-  return _dpVal;
- }catch(e){return true}
-}
 function lrChecks(){
  const demoPins=["1111","2222","3333","4444","5555","6666"];
  const pins=(DB.shared.users||[]).filter(u=>u.active&&demoPins.some(p=>pinOk(u,p))).length;
