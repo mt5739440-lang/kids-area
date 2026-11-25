@@ -5,7 +5,7 @@
 const D={
 appName:["نظام إدارة كيدز إيريا","Kids Area Management"],
 login:["تسجيل الدخول","Sign in"],user:["المستخدم","User"],pin:["الرقم السري (PIN)","PIN"],enter:["دخول","Sign in"],logout:["تسجيل الخروج","Log out"],
-wrongPin:["الرقم السري غير صحيح","Wrong PIN"],setupTitle:["إنشاء أول مدير","Create the first admin"],setupHint:["هذا أول تشغيل ولا يوجد أي مستخدم. أنشئ حساب المدير برقم سري من 4 أرقام تختاره أنت.","First run: no users exist. Create the admin account with a 4-digit PIN of your choice."],setupName:["اسم المدير","Admin name"],setupPin:["الرقم السري (4 أرقام)","PIN (4 digits)"],setupPin2:["أعد كتابة الرقم السري","Repeat PIN"],setupCreate:["إنشاء الحساب والدخول","Create account and sign in"],setupNoName:["اكتب اسم المدير","Enter the admin name"],setupPin4:["الرقم السري يجب أن يكون 4 أرقام","PIN must be 4 digits"],setupMismatch:["الرقمان غير متطابقين","PINs do not match"],setupWeak:["رقم سري ضعيف (مكرر أو متسلسل)، اختر غيره","Weak PIN (repeated or sequential), choose another"],setupJoin:["هذا جهاز فرع؟ اربطه بقاعدة البيانات المشتركة","Branch device? Connect to the shared database"],setupJoinHint:["بدل إنشاء مدير جديد، أدخل بيانات Supabase لسحب المستخدمين والبيانات الموجودة.","Instead of creating a new admin, enter the Supabase details to pull existing users and data."],setupJoinBtn:["ربط وسحب البيانات","Connect and pull data"],rights:["© 2026 SYSTEM KIDS AREA — جميع الحقوق محفوظة","© 2026 SYSTEM KIDS AREA — All rights reserved"],
+wrongPin:["الرقم السري غير صحيح","Wrong PIN"],setupTitle:["إنشاء أول مدير","Create the first admin"],setupHint:["هذا أول تشغيل ولا يوجد أي مستخدم. أنشئ حساب المدير برقم سري من 4 أرقام تختاره أنت.","First run: no users exist. Create the admin account with a 4-digit PIN of your choice."],setupName:["اسم المدير","Admin name"],setupPin:["الرقم السري (4 أرقام)","PIN (4 digits)"],setupPin2:["أعد كتابة الرقم السري","Repeat PIN"],setupCreate:["إنشاء الحساب والدخول","Create account and sign in"],setupNoName:["اكتب اسم المدير","Enter the admin name"],setupPin4:["الرقم السري يجب أن يكون 4 أرقام","PIN must be 4 digits"],setupMismatch:["الرقمان غير متطابقين","PINs do not match"],setupWeak:["رقم سري ضعيف (مكرر أو متسلسل)، اختر غيره","Weak PIN (repeated or sequential), choose another"],setupJoin:["هذا جهاز فرع؟ اربطه بقاعدة البيانات المشتركة","Branch device? Connect to the shared database"],setupJoinHint:["بدل إنشاء مدير جديد، أدخل بيانات Supabase لسحب المستخدمين والبيانات الموجودة.","Instead of creating a new admin, enter the Supabase details to pull existing users and data."],setupJoinBtn:["ربط وسحب البيانات","Connect and pull data"],eraseBtn:["حذف بيانات العميل نهائيًا","Erase customer data permanently"],eraseSure:["سيتم حذف ولي الأمر وأطفاله وباقاتهم ورصيدهم نهائيًا من كل الفروع، وإخفاء اسمهم ورقمهم من الفواتير والحجوزات وسجل العمليات. الفواتير والمبالغ تبقى للمحاسبة بدون هوية. لا يمكن التراجع. متابعة؟","Guardian, children, packages and balance will be erased from all branches, and their name/phone hidden in invoices, bookings and the audit log. Invoices and amounts stay for accounting without identity. This cannot be undone. Continue?"],eraseSure2:["تأكيد أخير: حذف نهائي للعميل","Final confirmation: erase this customer"],eraseBal:["تنبيه: للعميل باقة فعّالة أو رصيد، وسيضيع بالحذف.","Warning: the customer has an active package or balance that will be lost."],eraseInside:["لا يمكن الحذف والطفل داخل المكان الآن. أنهِ الزيارة أولًا.","Cannot erase while a child is checked in. Check out first."],eraseDone:["تم حذف بيانات العميل","Customer data erased"],erasedName:["عميل محذوف","Erased customer"],rights:["© 2026 SYSTEM KIDS AREA — جميع الحقوق محفوظة","© 2026 SYSTEM KIDS AREA — All rights reserved"],
 present:["الأطفال الموجودين الآن","Children inside now"],newEntry:["تسجيل دخول","New check-in"],history:["الزيارات والتقارير","Visits & reports"],
 guardians:["أولياء الأمور والأطفال","Guardians & children"],settings:["الإعدادات","Settings"],users:["المستخدمين","Users"],audit:["سجل التدقيق","Audit log"],
 searchHere:["ابحث بالاسم أو الموبايل أو رقم الإيصال","Search name, phone or receipt no."],
@@ -195,8 +195,8 @@ let me=(()=>{try{const id=sessionStorage.getItem("ls_user");return id?S.users.fi
 function bindBranch(){if(!me)return;let b=me.branch==="all"?CUR:me.branch;if(!DB.branches.some(x=>x.id===b))b=DB.branches[0].id;if(b!==CUR)enterBranch(b)}
 bindBranch();
 const can=p=>!!me&&PERMS[me.role].includes(p);
-const G=id=>S.guardians.find(g=>g.id===id)||{name:"?",phone:""};
-const C=id=>S.children.find(c=>c.id===id)||{name:"?"};
+const G=id=>S.guardians.find(g=>g.id===id)||{name:t("erasedName"),phone:""};
+const C=id=>S.children.find(c=>c.id===id)||{name:t("erasedName")};
 const pn=v=>v.planName[lang]||v.planName.ar;
 function toast(m){const e=$("#toast");e.textContent=m;e.style.display="block";clearTimeout(toast._t);toast._t=setTimeout(()=>e.style.display="none",2600)}
 function modal(h){const m=$("#modal");m.innerHTML='<div class="dlg">'+h+"</div>";m.hidden=false}
@@ -412,7 +412,35 @@ function guardianModal(gid,cb){
  const g=gid?S.guardians.find(x=>x.id===gid):null;_cb=cb||null;
  modal("<h3>"+(g?t("editGuardian"):t("newGuardian"))+'</h3><label>'+t("guardianName")+'<input id="gn" value="'+esc(g?g.name:"")+'"></label><label>'+t("phone")+'<input id="gp" inputmode="tel" dir="ltr" value="'+esc(g?g.phone:"")+'"></label><label>'+t("morePhones")+'<input id="gp2" inputmode="tel" dir="ltr" value="'+esc(g?(g.morePhones||[]).join(", "):"")+'"></label><label>'+t("notes")+'<input id="gnote" value="'+esc(g?g.notes:"")+'"></label>'+
  (g?"":"<h4>"+t("firstChild")+'</h4><label>'+t("childName")+'<input id="cn"></label><label>'+t("age")+'<input id="ca" type="number" min="0" max="17"></label><label>'+t("notes")+'<input id="cnote"></label>')+
- '<div class="row"><button class="btn pri" onclick="saveGuardian(\''+(gid||"")+'\')">'+t("save")+'</button><button class="btn" onclick="closeModal()">'+t("cancel")+"</button></div>");
+ '<div class="row"><button class="btn pri" onclick="saveGuardian(\''+(gid||"")+'\')">'+t("save")+'</button><button class="btn" onclick="closeModal()">'+t("cancel")+"</button>"+(g&&can("reset")?'<button class="btn bad" onclick="guardianErase(\''+gid+'\')">'+t("eraseBtn")+"</button>":"")+"</div>");
+}
+/* ============ حذف بيانات عميل نهائيًا (عند طلبه أو انتهاء الغرض) ============ */
+function eraseTxt(str,words,rep){if(typeof str!=="string"||!str)return str;let o=str;words.forEach(w=>{if(w&&w.length>=2)o=o.split(w).join(rep)});return o}
+function guardianErase(gid){
+ if(!can("reset"))return;
+ const g=S.guardians.find(x=>x.id===gid);if(!g)return;
+ const kids=S.children.filter(c=>c.guardianId===gid),kidIds=kids.map(c=>c.id);
+ if(S.visits.some(v=>v.status==="in"&&(v.guardianId===gid||kidIds.indexOf(v.childId)>=0))){toast(t("eraseInside"));return}
+ const bal=(S.balances&&S.balances[gid])||0,subs=(S.subs||[]).filter(x=>x.gid===gid&&x.status==="active"&&x.remaining>0&&x.expiresAt>Date.now());
+ if(!confirm(t("eraseSure")+(bal>0||subs.length?"\n\n"+t("eraseBal"):"")))return;
+ if(!confirm(t("eraseSure2")+"\n"+g.name))return;
+ const words=[g.name].concat(kids.map(c=>c.name),phonesOf(g)),rep=t("erasedName");
+ syncOut();
+ const states=DB.branches.map(b=>DB.byBranch[b.id]).filter(Boolean);
+ states.forEach(b=>{
+  (b.invoices||[]).forEach(inv=>{(inv.lines||[]).forEach(l=>{l.name=eraseTxt(l.name,words,rep)});if(inv.gid===gid)delete inv.gid;if(inv.note)inv.note=eraseTxt(inv.note,words,rep)});
+  (b.bookings||[]).forEach(bk=>{if(bk.gid===gid||(bk.phone&&phonesOf(g).indexOf(bk.phone)>=0)){bk.name=rep;bk.phone="";bk.child="";bk.note="";delete bk.gid;if(bk.notes)bk.notes=""}});
+  (b.visits||[]).forEach(v=>{if(v.note)v.note=eraseTxt(v.note,words,rep);if(v.lateNote)v.lateNote=eraseTxt(v.lateNote,words,rep)});
+  (b.audit||[]).forEach(a=>{a.details=eraseTxt(a.details,words,rep)});
+ });
+ S.guardians=S.guardians.filter(x=>x.id!==gid);
+ S.children=S.children.filter(c=>c.guardianId!==gid);
+ S.subs=(S.subs||[]).filter(x=>x.gid!==gid);
+ if(S.balances)delete S.balances[gid];
+ S.walletTx=(S.walletTx||[]).filter(x=>x.gid!==gid&&x.g!==gid);
+ S.couponUses=(S.couponUses||[]).filter(x=>x.gid!==gid);
+ try{localStorage.removeItem(BKKEY)}catch(e){}
+ log("erase customer","#"+gid);save();closeModal();toast(t("eraseDone"));render();
 }
 function validAge(a){return Number.isInteger(a)&&a>=0&&a<=17}
 function saveGuardian(gid){
