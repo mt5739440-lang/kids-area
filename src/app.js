@@ -5,7 +5,7 @@
 const D={
 appName:["نظام إدارة كيدز إيريا","Kids Area Management"],
 login:["تسجيل الدخول","Sign in"],user:["المستخدم","User"],pin:["الرقم السري (PIN)","PIN"],enter:["دخول","Sign in"],logout:["تسجيل الخروج","Log out"],
-wrongPin:["الرقم السري غير صحيح","Wrong PIN"],setupTitle:["إنشاء أول مدير","Create the first admin"],setupHint:["هذا أول تشغيل ولا يوجد أي مستخدم. أنشئ حساب المدير برقم سري من 4 أرقام تختاره أنت.","First run: no users exist. Create the admin account with a 4-digit PIN of your choice."],setupName:["اسم المدير","Admin name"],setupPin:["الرقم السري (4 أرقام)","PIN (4 digits)"],setupPin2:["أعد كتابة الرقم السري","Repeat PIN"],setupCreate:["إنشاء الحساب والدخول","Create account and sign in"],setupNoName:["اكتب اسم المدير","Enter the admin name"],setupPin4:["الرقم السري يجب أن يكون 4 أرقام","PIN must be 4 digits"],setupMismatch:["الرقمان غير متطابقين","PINs do not match"],setupWeak:["رقم سري ضعيف (مكرر أو متسلسل)، اختر غيره","Weak PIN (repeated or sequential), choose another"],setupJoin:["هذا جهاز فرع؟ اربطه بقاعدة البيانات المشتركة","Branch device? Connect to the shared database"],setupJoinHint:["بدل إنشاء مدير جديد، أدخل بيانات Supabase لسحب المستخدمين والبيانات الموجودة.","Instead of creating a new admin, enter the Supabase details to pull existing users and data."],setupJoinBtn:["ربط وسحب البيانات","Connect and pull data"],eraseBtn:["حذف بيانات العميل نهائيًا","Erase customer data permanently"],eraseSure:["سيتم حذف ولي الأمر وأطفاله وباقاتهم ورصيدهم نهائيًا من كل الفروع، وإخفاء اسمهم ورقمهم من الفواتير والحجوزات وسجل العمليات. الفواتير والمبالغ تبقى للمحاسبة بدون هوية. لا يمكن التراجع. متابعة؟","Guardian, children, packages and balance will be erased from all branches, and their name/phone hidden in invoices, bookings and the audit log. Invoices and amounts stay for accounting without identity. This cannot be undone. Continue?"],eraseSure2:["تأكيد أخير: حذف نهائي للعميل","Final confirmation: erase this customer"],eraseBal:["تنبيه: للعميل باقة فعّالة أو رصيد، وسيضيع بالحذف.","Warning: the customer has an active package or balance that will be lost."],eraseInside:["لا يمكن الحذف والطفل داخل المكان الآن. أنهِ الزيارة أولًا.","Cannot erase while a child is checked in. Check out first."],eraseDone:["تم حذف بيانات العميل","Customer data erased"],erasedName:["عميل محذوف","Erased customer"],rights:["© 2026 SYSTEM KIDS AREA — جميع الحقوق محفوظة","© 2026 SYSTEM KIDS AREA — All rights reserved"],
+wrongPin:["الرقم السري غير صحيح","Wrong PIN"],setupTitle:["إنشاء أول مدير","Create the first admin"],setupHint:["هذا أول تشغيل ولا يوجد أي مستخدم. أنشئ حساب المدير برقم سري من 4 أرقام تختاره أنت.","First run: no users exist. Create the admin account with a 4-digit PIN of your choice."],setupName:["اسم المدير","Admin name"],setupPin:["الرقم السري (4 أرقام)","PIN (4 digits)"],setupPin2:["أعد كتابة الرقم السري","Repeat PIN"],setupCreate:["إنشاء الحساب والدخول","Create account and sign in"],setupNoName:["اكتب اسم المدير","Enter the admin name"],setupPin4:["الرقم السري يجب أن يكون 4 أرقام","PIN must be 4 digits"],setupMismatch:["الرقمان غير متطابقين","PINs do not match"],setupWeak:["رقم سري ضعيف (مكرر أو متسلسل)، اختر غيره","Weak PIN (repeated or sequential), choose another"],setupJoin:["هذا جهاز فرع؟ اربطه بقاعدة البيانات المشتركة","Branch device? Connect to the shared database"],setupJoinHint:["بدل إنشاء مدير جديد، أدخل بيانات Supabase لسحب المستخدمين والبيانات الموجودة.","Instead of creating a new admin, enter the Supabase details to pull existing users and data."],setupJoinBtn:["ربط وسحب البيانات","Connect and pull data"],eraseBtn:["حذف بيانات العميل نهائيًا","Erase customer data permanently"],eraseSure:["سيتم حذف ولي الأمر وأطفاله وباقاتهم ورصيدهم نهائيًا من كل الفروع، وإخفاء اسمهم ورقمهم من الفواتير والحجوزات وسجل العمليات. الفواتير والمبالغ تبقى للمحاسبة بدون هوية. لا يمكن التراجع. متابعة؟","Guardian, children, packages and balance will be erased from all branches, and their name/phone hidden in invoices, bookings and the audit log. Invoices and amounts stay for accounting without identity. This cannot be undone. Continue?"],eraseSure2:["تأكيد أخير: حذف نهائي للعميل","Final confirmation: erase this customer"],eraseBal:["تنبيه: للعميل باقة فعّالة أو رصيد، وسيضيع بالحذف.","Warning: the customer has an active package or balance that will be lost."],eraseInside:["لا يمكن الحذف والطفل داخل المكان الآن. أنهِ الزيارة أولًا.","Cannot erase while a child is checked in. Check out first."],eraseDone:["تم حذف بيانات العميل","Customer data erased"],erasedName:["عميل محذوف","Erased customer"],pinLocked:["محاولات كثيرة خاطئة. انتظر","Too many wrong attempts. Wait"],secs:["ثانية","s"],idleOut:["تم تسجيل الخروج لعدم النشاط","Signed out due to inactivity"],rights:["© 2026 SYSTEM KIDS AREA — جميع الحقوق محفوظة","© 2026 SYSTEM KIDS AREA — All rights reserved"],
 present:["الأطفال الموجودين الآن","Children inside now"],newEntry:["تسجيل دخول","New check-in"],history:["الزيارات والتقارير","Visits & reports"],
 guardians:["أولياء الأمور والأطفال","Guardians & children"],settings:["الإعدادات","Settings"],users:["المستخدمين","Users"],audit:["سجل التدقيق","Audit log"],
 searchHere:["ابحث بالاسم أو الموبايل أو رقم الإيصال","Search name, phone or receipt no."],
@@ -308,11 +308,26 @@ function setupAdmin(){
  const u={id:uid(),name:name,role:"admin",active:true,branch:"all"};pinSet(u,p1);S.users.push(u);
  me=u;log("first admin created",name);bindBranch();try{sessionStorage.setItem("ls_user",u.id)}catch(e){}save();view="present";render();
 }
+/* حماية الدخول: قفل مؤقت بعد 5 محاولات خاطئة لنفس المستخدم، ويتضاعف زمن القفل (30ث، 60ث، 2د ... حتى 15د) */
+const PINFK="ls_pinfail";
+function pinFails(){try{return JSON.parse(localStorage.getItem(PINFK)||"{}")}catch(e){return {}}}
+function pinFailSave(o){try{localStorage.setItem(PINFK,JSON.stringify(o))}catch(e){}}
+function pinLockLeft(id){const f=pinFails()[id];return f&&f.until>Date.now()?Math.ceil((f.until-Date.now())/1000):0}
+function pinFailAdd(id){const o=pinFails(),f=o[id]||{n:0,until:0};f.n++;if(f.n>=5)f.until=Date.now()+Math.min(900000,30000*Math.pow(2,f.n-5));o[id]=f;pinFailSave(o);log("login failed",id)}
 function doLogin(){
  const u=S.users.find(x=>x.id===$("#lu").value&&x.active);
- if(!u||!pinOk(u,norm($("#lp").value))){toast(t("wrongPin"));return}
+ const lk=u?pinLockLeft(u.id):0;
+ if(lk){toast(t("pinLocked")+" "+lk+" "+t("secs"));return}
+ if(!u||!pinOk(u,norm($("#lp").value))){if(u){pinFailAdd(u.id);save()}toast(t("wrongPin"));return}
+ {const o=pinFails();if(o[u.id]){delete o[u.id];pinFailSave(o)}}
  me=u;bindBranch();try{sessionStorage.setItem("ls_user",u.id)}catch(e){}log("login");autoBackup();save();view="present";render();
 }
+/* خروج تلقائي عند عدم النشاط (الافتراضي 30 دقيقة؛ S.settings.idleMin=0 لإيقافه) */
+let lastAct=Date.now();
+function idleLimit(){const m=S&&S.settings&&S.settings.idleMin;return (m==null?30:+m)*60000}
+function idleCheck(){if(!me)return;const L=idleLimit();if(L>0&&Date.now()-lastAct>L){toast(t("idleOut"));logout()}}
+["click","keydown","touchstart","mousemove"].forEach(e=>document.addEventListener(e,()=>{lastAct=Date.now()},{passive:true,capture:true}));
+setInterval(idleCheck,30000);
 function logout(){log("logout");save();me=null;try{sessionStorage.removeItem("ls_user")}catch(e){}render()}
 
 /* ============ present now ============ */
