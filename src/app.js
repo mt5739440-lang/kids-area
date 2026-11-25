@@ -1,10 +1,11 @@
+/* © 2026 SYSTEM KIDS AREA. All rights reserved. Copying, redistribution or use without the owner's written permission is prohibited. */
 
 "use strict";
 /* ============ i18n ============ */
 const D={
 appName:["نظام إدارة كيدز إيريا","Kids Area Management"],
 login:["تسجيل الدخول","Sign in"],user:["المستخدم","User"],pin:["الرقم السري (PIN)","PIN"],enter:["دخول","Sign in"],logout:["تسجيل الخروج","Log out"],
-wrongPin:["الرقم السري غير صحيح","Wrong PIN"],demoHint:["بيانات تجريبية للدخول: كاشير 1111 • مشرف 2222 • مدير عمليات 3333 • إدارة 4444","Demo logins: Cashier 1111 • Supervisor 2222 • Ops manager 3333 • Admin 4444"],
+wrongPin:["الرقم السري غير صحيح","Wrong PIN"],rights:["© 2026 SYSTEM KIDS AREA — جميع الحقوق محفوظة","© 2026 SYSTEM KIDS AREA — All rights reserved"],demoHint:["بيانات تجريبية للدخول: كاشير 1111 • مشرف 2222 • مدير عمليات 3333 • إدارة 4444","Demo logins: Cashier 1111 • Supervisor 2222 • Ops manager 3333 • Admin 4444"],
 present:["الأطفال الموجودين الآن","Children inside now"],newEntry:["تسجيل دخول","New check-in"],history:["الزيارات والتقارير","Visits & reports"],
 guardians:["أولياء الأمور والأطفال","Guardians & children"],settings:["الإعدادات","Settings"],users:["المستخدمين","Users"],audit:["سجل التدقيق","Audit log"],
 searchHere:["ابحث بالاسم أو الموبايل أو رقم الإيصال","Search name, phone or receipt no."],
@@ -281,7 +282,7 @@ function render(){
 }
 function renderLogin(){
  const act=S.users.filter(u=>u.active);
- $("#app").innerHTML='<div class="login card"><h2>'+t("appName")+'</h2><label>'+t("user")+'<select id="lu">'+act.map(u=>'<option value="'+u.id+'">'+esc(u.name)+" – "+t(ROLES[u.role])+"</option>").join("")+'</select></label><label>'+t("pin")+'<input id="lp" type="password" inputmode="numeric" maxlength="4" onkeydown="if(event.key===\'Enter\')doLogin()"></label><button class="btn pri big" onclick="doLogin()">'+t("enter")+'</button>'+(demoPinsLeft()?'<p class="muted">'+t("demoHint")+'</p>':'')+'<div class="row"><button class="btn sm" onclick="setLang(\''+(lang==="ar"?"en":"ar")+'\')">'+(lang==="ar"?"English":"عربي")+"</button></div></div>";
+ $("#app").innerHTML='<div class="login card"><h2>'+t("appName")+'</h2><label>'+t("user")+'<select id="lu">'+act.map(u=>'<option value="'+u.id+'">'+esc(u.name)+" – "+t(ROLES[u.role])+"</option>").join("")+'</select></label><label>'+t("pin")+'<input id="lp" type="password" inputmode="numeric" maxlength="4" onkeydown="if(event.key===\'Enter\')doLogin()"></label><button class="btn pri big" onclick="doLogin()">'+t("enter")+'</button>'+(demoPinsLeft()?'<p class="muted">'+t("demoHint")+'</p>':'')+'<p class="muted" style="font-size:11px;text-align:center;margin-top:14px">'+t("rights")+'</p><div class="row"><button class="btn sm" onclick="setLang(\''+(lang==="ar"?"en":"ar")+'\')">'+(lang==="ar"?"English":"عربي")+"</button></div></div>";
 }
 function doLogin(){
  const u=S.users.find(x=>x.id===$("#lu").value&&x.active);
@@ -1486,7 +1487,7 @@ function saveMoney(kind){
   if(payLocked(d.slice(0,7))){toast(t("monthLocked"));return}
   S.penalties.push({id:uid(),emp:emp,date:d,amount:a,reason:reason,by:me.id});log("penalty",empN(emp)+" "+a+" "+reason);
  }else{
-  const dm=monthAdd(d.slice(0,7),1);if(payLocked(dm)){toast(t("monthLocked"));return}
+  const dm=d.slice(0,7);if(payLocked(dm)){toast(t("monthLocked"));return}
   {const em=S.employees.find(x=>x.id===emp),cap=r2(em.wage*30*S.settings.advMaxPct/100),used=r2(S.advances.filter(x=>x.emp===emp&&x.deductMonth===dm).reduce((q,x)=>q+x.amount,0));if(used+a>cap+0.001){toast(t("advCap")+" "+money(Math.max(0,r2(cap-used))));return}}
   S.advances.push({id:uid(),emp:emp,date:d,amount:a,reason:reason,by:me.id,deductMonth:dm});log("advance",empN(emp)+" "+a+" → "+dm);
  }
