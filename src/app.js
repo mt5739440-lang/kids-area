@@ -2525,11 +2525,11 @@ function alertApply(){
  document.querySelectorAll(".alertbox").forEach(el=>{
   if(sec<=0){el.style.display="";return}
   const k=el.textContent.replace(/\s+/g," ").trim(),r=ALK[k]||(ALK[k]={t:now}),left=sec*1000-(now-r.t);
-  if(left<=0){el.style.display="none";return}
-  if(!el._al)el._al=setTimeout(()=>{el.style.display="none"},left);
+  el.style.display=left<=0?"none":"";
  });
 }
-{let _t=null;try{new MutationObserver(()=>{clearTimeout(_t);_t=setTimeout(alertApply,0)}).observe(document.body,{childList:true,subtree:true})}catch(e){}}
+try{new MutationObserver(alertApply).observe(document.body,{childList:true,subtree:true})}catch(e){}
+setInterval(alertApply,250);
 function alertsCard(){
  if(!can("settings"))return "";
  return '<div class="card" id="alcard"><h3>'+t("alTitle")+'</h3><div class="muted">'+t("alNote")+'</div><div class="grid2"><label>'+t("alBanner")+'<input id="al_b" type="number" min="0" max="600" value="'+alertSec()+'"></label><label>'+t("alToast")+'<input id="al_t" type="number" min="1" max="30" value="'+toastSec()+'"></label></div><div class="row"><button class="btn pri" onclick="saveAlertPrefs()">'+t("save")+"</button></div></div>";
