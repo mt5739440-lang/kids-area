@@ -5,7 +5,7 @@
 const D={
 appName:["نظام إدارة كيدز إيريا","Kids Area Management"],
 login:["تسجيل الدخول","Sign in"],user:["المستخدم","User"],pin:["الرقم السري (PIN)","PIN"],enter:["دخول","Sign in"],logout:["تسجيل الخروج","Log out"],
-wrongPin:["الرقم السري غير صحيح","Wrong PIN"],setupTitle:["إنشاء أول مدير","Create the first admin"],setupHint:["هذا أول تشغيل ولا يوجد أي مستخدم. أنشئ حساب المدير برقم سري من 4 أرقام تختاره أنت.","First run: no users exist. Create the admin account with a 4-digit PIN of your choice."],setupName:["اسم المدير","Admin name"],setupPin:["الرقم السري (4 أرقام)","PIN (4 digits)"],setupPin2:["أعد كتابة الرقم السري","Repeat PIN"],setupCreate:["إنشاء الحساب والدخول","Create account and sign in"],setupNoName:["اكتب اسم المدير","Enter the admin name"],setupPin4:["الرقم السري يجب أن يكون 4 أرقام","PIN must be 4 digits"],setupMismatch:["الرقمان غير متطابقين","PINs do not match"],setupWeak:["رقم سري ضعيف (مكرر أو متسلسل)، اختر غيره","Weak PIN (repeated or sequential), choose another"],setupJoin:["هذا جهاز فرع؟ اربطه بقاعدة البيانات المشتركة","Branch device? Connect to the shared database"],setupJoinHint:["بدل إنشاء مدير جديد، أدخل بيانات Supabase لسحب المستخدمين والبيانات الموجودة.","Instead of creating a new admin, enter the Supabase details to pull existing users and data."],setupJoinBtn:["ربط وسحب البيانات","Connect and pull data"],eraseBtn:["حذف بيانات العميل نهائيًا","Erase customer data permanently"],eraseSure:["سيتم حذف ولي الأمر وأطفاله وباقاتهم ورصيدهم نهائيًا من كل الفروع، وإخفاء اسمهم ورقمهم من الفواتير والحجوزات وسجل العمليات. الفواتير والمبالغ تبقى للمحاسبة بدون هوية. لا يمكن التراجع. متابعة؟","Guardian, children, packages and balance will be erased from all branches, and their name/phone hidden in invoices, bookings and the audit log. Invoices and amounts stay for accounting without identity. This cannot be undone. Continue?"],eraseSure2:["تأكيد أخير: حذف نهائي للعميل","Final confirmation: erase this customer"],eraseBal:["تنبيه: للعميل باقة فعّالة أو رصيد، وسيضيع بالحذف.","Warning: the customer has an active package or balance that will be lost."],eraseInside:["لا يمكن الحذف والطفل داخل المكان الآن. أنهِ الزيارة أولًا.","Cannot erase while a child is checked in. Check out first."],eraseDone:["تم حذف بيانات العميل","Customer data erased"],erasedName:["عميل محذوف","Erased customer"],pinLocked:["محاولات كثيرة خاطئة. انتظر","Too many wrong attempts. Wait"],secs:["ثانية","s"],idleOut:["تم تسجيل الخروج لعدم النشاط","Signed out due to inactivity"],alTitle:["مدة التنبيهات والرسائل","Alert and message duration"],alNote:["اللافتات الملوّنة (المتأخرون، المخزون، النسخ...) تختفي بعد المدة وتظهر من جديد عند فتح الشاشة أو تغيّر العدد. اكتب 0 لتبقى ثابتة.","Coloured banners (late kids, stock, backup...) hide after this time and reappear when a screen is opened or the count changes. Enter 0 to keep them fixed."],alBanner:["مدة ظهور اللافتات (ثانية، 0 = ثابتة)","Banner duration (seconds, 0 = fixed)"],alToast:["مدة الرسائل العابرة (ثانية)","Message duration (seconds)"],alBad:["اللافتات من 0 إلى 600 ثانية والرسائل من 1 إلى 30","Banners 0–600 s, messages 1–30 s"],rights:["© 2026 SYSTEM KIDS AREA — جميع الحقوق محفوظة","© 2026 SYSTEM KIDS AREA — All rights reserved"],
+wrongPin:["الرقم السري غير صحيح","Wrong PIN"],setupTitle:["إنشاء أول مدير","Create the first admin"],setupHint:["هذا أول تشغيل ولا يوجد أي مستخدم. أنشئ حساب المدير برقم سري من 4 أرقام تختاره أنت.","First run: no users exist. Create the admin account with a 4-digit PIN of your choice."],setupName:["اسم المدير","Admin name"],setupPin:["الرقم السري (4 أرقام)","PIN (4 digits)"],setupPin2:["أعد كتابة الرقم السري","Repeat PIN"],setupCreate:["إنشاء الحساب والدخول","Create account and sign in"],setupNoName:["اكتب اسم المدير","Enter the admin name"],setupPin4:["الرقم السري يجب أن يكون 4 أرقام","PIN must be 4 digits"],setupMismatch:["الرقمان غير متطابقين","PINs do not match"],setupWeak:["رقم سري ضعيف (مكرر أو متسلسل)، اختر غيره","Weak PIN (repeated or sequential), choose another"],setupJoin:["هذا جهاز فرع؟ اربطه بقاعدة البيانات المشتركة","Branch device? Connect to the shared database"],setupJoinHint:["بدل إنشاء مدير جديد، أدخل بيانات Supabase لسحب المستخدمين والبيانات الموجودة.","Instead of creating a new admin, enter the Supabase details to pull existing users and data."],setupJoinBtn:["ربط وسحب البيانات","Connect and pull data"],eraseBtn:["حذف بيانات العميل نهائيًا","Erase customer data permanently"],eraseSure:["سيتم حذف ولي الأمر وأطفاله وباقاتهم ورصيدهم نهائيًا من كل الفروع، وإخفاء اسمهم ورقمهم من الفواتير والحجوزات وسجل العمليات. الفواتير والمبالغ تبقى للمحاسبة بدون هوية. لا يمكن التراجع. متابعة؟","Guardian, children, packages and balance will be erased from all branches, and their name/phone hidden in invoices, bookings and the audit log. Invoices and amounts stay for accounting without identity. This cannot be undone. Continue?"],eraseSure2:["تأكيد أخير: حذف نهائي للعميل","Final confirmation: erase this customer"],eraseBal:["تنبيه: للعميل باقة فعّالة أو رصيد، وسيضيع بالحذف.","Warning: the customer has an active package or balance that will be lost."],eraseInside:["لا يمكن الحذف والطفل داخل المكان الآن. أنهِ الزيارة أولًا.","Cannot erase while a child is checked in. Check out first."],eraseDone:["تم حذف بيانات العميل","Customer data erased"],erasedName:["عميل محذوف","Erased customer"],pinLocked:["محاولات كثيرة خاطئة. انتظر","Too many wrong attempts. Wait"],secs:["ثانية","s"],idleOut:["تم تسجيل الخروج لعدم النشاط","Signed out due to inactivity"],alTitle:["مدة التنبيهات والرسائل","Alert and message duration"],alNote:["اللافتات الملوّنة (المتأخرون، المخزون، النسخ...) تختفي بعد المدة وتظهر من جديد عند فتح الشاشة أو تغيّر العدد. اكتب 0 لتبقى ثابتة.","Coloured banners (late kids, stock, backup...) hide after this time and reappear when a screen is opened or the count changes. Enter 0 to keep them fixed."],alBanner:["مدة ظهور اللافتات (ثانية، 0 = ثابتة)","Banner duration (seconds, 0 = fixed)"],alToast:["مدة الرسائل العابرة (ثانية)","Message duration (seconds)"],alBad:["اللافتات من 0 إلى 600 ثانية والرسائل من 1 إلى 30","Banners 0–600 s, messages 1–30 s"],kidOrders:["طلبات الكافتيريا","Cafeteria orders"],kidOrdersNote:["تُضاف على حساب الطفل وتُحاسَب مع الوقت عند تسجيل الخروج.","Added to the child's bill and paid with the time at check-out."],kidNoOrders:["لا توجد طلبات بعد","No orders yet"],done:["تم","Done"],noPerm:["غير مسموح","Not allowed"],rights:["© 2026 SYSTEM KIDS AREA — جميع الحقوق محفوظة","© 2026 SYSTEM KIDS AREA — All rights reserved"],
 present:["الأطفال الموجودين الآن","Children inside now"],newEntry:["تسجيل دخول","New check-in"],history:["الزيارات والتقارير","Visits & reports"],
 guardians:["أولياء الأمور والأطفال","Guardians & children"],settings:["الإعدادات","Settings"],users:["المستخدمين","Users"],audit:["سجل التدقيق","Audit log"],
 searchHere:["ابحث بالاسم أو الموبايل أو رقم الإيصال","Search name, phone or receipt no."],
@@ -244,10 +244,10 @@ function receiptEntry(vs){
 function receiptExitGroup(vs,inv){
  const g=G(vs[0].guardianId),ts=vs[0].checkOut;let tot=0;
  let h=rcptHead(t("rcptExit"),vs[0].rno+(inv?" / "+inv.no:""),ts)+'<div class="r"><span>'+t("guardian")+'</span><span class="b">'+esc(g.name)+"</span></div><hr>";
- vs.forEach(v=>{const dur=Math.round((v.checkOut-v.checkIn)/60000);tot+=(v.total||0);
+ vs.forEach(v=>{const dur=Math.round((v.checkOut-v.checkIn)/60000);tot+=(v.total||0)+(v.itemsTotal||0);
   h+='<div class="kid"><div class="b">'+esc(C(v.childId).name)+'</div><div class="r"><span>'+t("checkIn")+'</span><span>'+fTime(v.checkIn)+'</span></div><div class="r"><span>'+t("checkOut")+'</span><span>'+fTime(v.checkOut)+'</span></div><div class="r"><span>'+t("duration")+'</span><span>'+fMin(dur)+'</span></div><div class="r"><span>'+t("plan")+'</span><span>'+esc(pn(v))+"</span></div>"+
   (v.payMode==="pkg"?'<div class="r"><span>'+t("fromPackage")+'</span><span>'+fMin(v.pkgMins||0)+"</span></div>":'<div class="r"><span>'+t("planPrice")+'</span><span>'+esc(money(v.price))+"</span></div>")+
-  (v.lateFee>0?'<div class="r"><span>'+t("late")+" ("+fMin(v.lateMin)+')</span><span>'+esc(money(v.lateFee))+"</span></div>":"")+"</div><hr>";
+  (v.lateFee>0?'<div class="r"><span>'+t("late")+" ("+fMin(v.lateMin)+')</span><span>'+esc(money(v.lateFee))+"</span></div>":"")+vItems(v).map(x=>'<div class="r"><span>'+esc(x.name)+(x.qty>1?" ×"+x.qty:"")+'</span><span>'+esc(money(x.qty*x.price))+"</span></div>").join("")+"</div><hr>";
  });
  if(inv&&inv.disc&&inv.disc.amount>0)h+='<div class="r"><span>'+t("discount")+'</span><span>-'+esc(money(inv.disc.amount))+"</span></div>";
  h+='<div class="r b"><span>'+t("total")+'</span><span>'+esc(money(inv?inv.total:tot))+'</span></div><hr><div class="c">'+t("thanks")+"</div>";
@@ -352,7 +352,7 @@ function presentRows(){
   else if(i.state==="over")cell='<span class="tag over">'+t("late")+" "+fDur(i.left)+"</span>";
   else cell='<span class="tag '+i.state+'">'+fDur(i.left)+"</span>";
   const g=G(v.guardianId);
-  return "<tr><td>"+v.rno+"</td><td><b>"+esc(C(v.childId).name)+"</b>"+(C(v.childId).notes?'<div class="muted">'+esc(C(v.childId).notes)+"</div>":"")+"</td><td>"+esc(g.name)+"</td><td dir=\"ltr\">"+esc(phonesTxt(g))+"</td><td>"+esc(pn(v))+(v.prepaid?' <span class="badge">'+t("paidTag")+"</span>":"")+(v.payMode==="pkg"?' <span class="badge">'+t("pkgTag")+"</span>":"")+"</td><td>"+fTime(v.checkIn)+"</td><td>"+cell+'</td><td><button class="btn ok sm" onclick="checkoutModal(\''+v.id+"')\">"+t("doCheckout")+'</button> <button class="btn sm" onclick="waVisit(\''+v.id+"')\">💬</button>"+(S.visits.filter(x=>x.status==="in"&&x.guardianId===v.guardianId).length>1?' <button class="btn sm" onclick="checkoutGroupModal(\''+v.guardianId+"')\">"+t("grpExit")+" ("+S.visits.filter(x=>x.status==="in"&&x.guardianId===v.guardianId).length+")</button>":"")+"</td></tr>";
+  return "<tr><td>"+v.rno+"</td><td><b>"+esc(C(v.childId).name)+"</b>"+(C(v.childId).notes?'<div class="muted">'+esc(C(v.childId).notes)+"</div>":"")+"</td><td>"+esc(g.name)+"</td><td dir=\"ltr\">"+esc(phonesTxt(g))+"</td><td>"+esc(pn(v))+(v.prepaid?' <span class="badge">'+t("paidTag")+"</span>":"")+(v.payMode==="pkg"?' <span class="badge">'+t("pkgTag")+"</span>":"")+"</td><td>"+fTime(v.checkIn)+"</td><td>"+cell+(vItems(v).length?' <span class="badge">🍽 '+money(vItemsTot(v))+"</span>":"")+'</td><td><button class="btn ok sm" onclick="checkoutModal(\''+v.id+"')\">"+t("doCheckout")+'</button> '+(can("pos")?'<button class="btn sm" onclick="visitItemsModal(\''+v.id+"')\">🍽</button> ":"")+'<button class="btn sm" onclick="waVisit(\''+v.id+"')\">💬</button>"+(S.visits.filter(x=>x.status==="in"&&x.guardianId===v.guardianId).length>1?' <button class="btn sm" onclick="checkoutGroupModal(\''+v.guardianId+"')\">"+t("grpExit")+" ("+S.visits.filter(x=>x.status==="in"&&x.guardianId===v.guardianId).length+")</button>":"")+"</td></tr>";
  }).join(""):'<tr><td colspan="8" class="muted">'+t("noneInside")+"</td></tr>";
 }
 window._md=0;["mousedown","touchstart"].forEach(e=>document.addEventListener(e,()=>{window._md=1},true));["mouseup","touchend","touchcancel"].forEach(e=>document.addEventListener(e,()=>{setTimeout(()=>{window._md=0},80)},true));
@@ -512,12 +512,40 @@ function checkoutModal(id,ts){
   (pk?'<div class="line"><span>'+t("fromPackage")+"</span><span>"+fMin(pk.use)+"</span></div>"+(pk.extra?'<div class="line"><span>'+t("extraTime")+"</span><span>"+fMin(pk.extra)+" • "+money(c.base)+"</span></div>":""):(c.sugBase!==undefined&&!v.prepaid&&c.late===0?('<label>'+t("priceEdit")+" ("+money(v.price)+')<input id="cbp" type="number" min="0" step="0.5" value="'+c.sugBase+'" oninput="coUpdate()"></label>'+(c.sugBase<v.price?'<div class="muted">'+t("earlyHint")+" "+esc(c.sugName)+" • "+money(c.sugBase)+"</div>":"")):'<div class="line"><span>'+t("planPrice")+(v.prepaid?" ("+t("paidTag")+")":"")+'</span><span id="cbase">'+money(c.base)+"</span></div>"))+
   (open||c.late===0?"":'<div class="line"><span>'+t("lateMin")+"</span><span>"+fMin(c.late)+'</span></div><div class="line"><span>'+t("suggestedFee")+"</span><span>"+money(c.sug)+"</span></div>"+
    '<label>'+t("lateFee")+'<input id="cfee" type="number" min="0" step="0.5" value="'+c.sug+'" oninput="coUpdate()" '+(can("late")?"":"disabled")+'></label>')+
-  (S.settings.pickupCheck?pickupBlock(v):"")+'<div class="line"><span>'+t("dueNow")+'</span><span class="tot" id="ctot">'+money((v.prepaid?0:(c.sugBase!==undefined?c.sugBase:c.base))+(open?0:c.sug))+'</span></div><label class="opt"><input type="checkbox" id="cpr" checked><span>'+t("printReceipt")+'</span></label><div class="row"><button class="btn ok" onclick="confirmCheckout()">'+t("confirmExit")+'</button><button class="btn" onclick="checkoutModal(\''+id+'\')">'+t("refreshTime")+'</button><button class="btn" onclick="closeModal()">'+t("cancel")+"</button></div>");
+  (vItems(v).length?vItems(v).map(x=>'<div class="line"><span>'+esc(x.name)+(x.qty>1?" ×"+x.qty:"")+"</span><span>"+money(x.qty*x.price)+"</span></div>").join(""):"")+(S.settings.pickupCheck?pickupBlock(v):"")+'<div class="line"><span>'+t("dueNow")+'</span><span class="tot" id="ctot">'+money((v.prepaid?0:(c.sugBase!==undefined?c.sugBase:c.base))+(open?0:c.sug)+vItemsTot(v))+'</span></div><label class="opt"><input type="checkbox" id="cpr" checked><span>'+t("printReceipt")+'</span></label><div class="row"><button class="btn ok" onclick="confirmCheckout()">'+t("confirmExit")+'</button><button class="btn" onclick="checkoutModal(\''+id+'\')">'+t("refreshTime")+'</button><button class="btn" onclick="closeModal()">'+t("cancel")+"</button></div>");
+}
+/* ============ طلبات الكافتيريا على زيارة الطفل: تُسجَّل أثناء الزيارة وتُحاسَب عند الخروج مع الوقت ============ */
+const vItems=v=>v.items||[];
+const vItemsTot=v=>r2(vItems(v).reduce((a,x)=>a+x.qty*x.price,0));
+function itemsReserved(pid){return S.visits.filter(v=>v.status==="in").reduce((a,v)=>a+vItems(v).filter(x=>x.pid===pid).reduce((b,x)=>b+x.qty,0),0)}
+function itemsFree(p){return tracked(p)?stockOf(p)-itemsReserved(p.id):1e9}
+function vItemsLines(v){return vItems(v).map(x=>({type:x.cat||"cafe",name:x.name+" – "+C(v.childId).name,qty:x.qty,price:x.price,pid:x.pid}))}
+function visitItemsModal(vid){
+ const v=S.visits.find(x=>x.id===vid);if(!v||v.status!=="in")return;
+ if(!can("pos")){toast(t("noPerm"));return}
+ const its=vItems(v),prods=S.products.filter(p=>p.active&&p.cat==="cafe"&&itemsFree(p)>0);
+ modal("<h3>"+t("kidOrders")+" – "+esc(C(v.childId).name)+'</h3><div class="muted">'+t("kidOrdersNote")+"</div><hr>"+
+  (its.length?its.map(x=>'<div class="line"><span>'+esc(x.name)+'</span><span><button class="btn sm" onclick="visitItemQty(\''+vid+"','"+x.id+'\',-1)">−</button> <b>'+x.qty+'</b> <button class="btn sm" onclick="visitItemQty(\''+vid+"','"+x.id+'\',1)">+</button> '+money(x.qty*x.price)+"</span></div>").join("")+'<div class="line"><span>'+t("total")+'</span><span class="tot">'+money(vItemsTot(v))+"</span></div>":'<div class="muted">'+t("kidNoOrders")+"</div>")+
+  '<h4>'+t("catCafe")+'</h4><div class="pgrid">'+(prods.length?prods.map(p=>'<button class="pbtn" onclick="visitItemAdd(\''+vid+"','"+p.id+'\')"><b>'+esc(pname(p))+"</b><span>"+money(p.price)+"</span></button>").join(""):'<div class="muted">'+t("none")+"</div>")+'</div><div class="row"><button class="btn pri" onclick="closeModal();render()">'+t("done")+"</button></div>");
+}
+function visitItemAdd(vid,pid){
+ const v=S.visits.find(x=>x.id===vid),p=S.products.find(x=>x.id===pid);if(!v||v.status!=="in"||!p||!can("pos"))return;
+ if(itemsFree(p)<1){toast(t("noStock"));return}
+ v.items=vItems(v);const x=v.items.find(z=>z.pid===pid);
+ if(x)x.qty++;else v.items.push({id:uid(),pid:pid,name:pname(p),cat:p.cat,qty:1,price:p.price,by:me.id,at:Date.now()});
+ log("child order","#"+v.rno+" "+pname(p));save();visitItemsModal(vid);
+}
+function visitItemQty(vid,iid,d){
+ const v=S.visits.find(x=>x.id===vid);if(!v||v.status!=="in"||!can("pos"))return;
+ const x=vItems(v).find(z=>z.id===iid);if(!x)return;
+ if(d>0){const p=S.products.find(z=>z.id===x.pid);if(p&&itemsFree(p)<1){toast(t("noStock"));return}}
+ x.qty+=d;if(x.qty<=0){v.items=v.items.filter(z=>z!==x);log("child order removed","#"+v.rno+" "+x.name)}
+ save();visitItemsModal(vid);
 }
 function coBase(){const e=$("#cbp");if(!e)return window._co.c.base;const n=parseFloat(norm(e.value));return isFinite(n)&&n>=0?n:0}
 function coFee(){const e=$("#cfee");if(!e)return 0;const n=parseFloat(norm(e.value));return isFinite(n)&&n>=0?n:0}
 function coUpdate(){
- const o=window._co,c=o.c,fee=coFee();$("#ctot").textContent=money((o.prep?0:coBase())+fee);
+ const o=window._co,c=o.c,fee=coFee();$("#ctot").textContent=money((o.prep?0:coBase())+fee+vItemsTot(S.visits.find(x=>x.id===o.id)||{}));
  
 }
 function confirmCheckout(){
@@ -536,7 +564,9 @@ function confirmCheckout(){
   else if(base>0)lines.push({type:"visit",name:pn(v)+" – "+C(v.childId).name,qty:1,price:base});
  }
  if(fee>0)lines.push({type:"late",name:t("late")+" – "+C(v.childId).name,qty:1,price:fee});
+ vItemsLines(v).forEach(l=>lines.push(l));
  const fin=inv=>{
+  v.itemsTotal=vItemsTot(v);
   v.checkOut=o.ts;v.status="out";v.pickup=pk;window._pkOv=null;v.outBy=me.id;v.lateMin=c.late;v.suggestedFee=c.sug;v.lateFee=fee;v.lateNote=note;
   if(open){v.price=c.base;v.units=c.units}else if(!v.prepaid&&!c.pkg&&base!==v.price){v.priceOrig=v.price;v.price=base}
   if(c.pkg&&c.pkg.use>0){pkgDeduct(v.guardianId,c.pkg.use,v.id);v.pkgMins=c.pkg.use}
@@ -568,7 +598,8 @@ function checkoutGroupModal(gid,ts){
   else if(c.sugBase!==undefined&&!v.prepaid&&c.late===0)priceHtml='<label>'+t("priceEdit")+" ("+money(v.price)+')<input id="gbp'+i+'" type="number" min="0" step="0.5" value="'+c.sugBase+'" oninput="grpUpdate()"></label>';
   else priceHtml='<div class="line"><span>'+t("planPrice")+(v.prepaid?" ("+t("paidTag")+")":"")+"</span><span>"+money(v.prepaid?0:c.base)+"</span></div>";
   const feeHtml=(open||c.late===0)?"":'<div class="line"><span>'+t("lateMin")+"</span><span>"+fMin(c.late)+'</span></div><label>'+t("lateFee")+'<input id="gfee'+i+'" type="number" min="0" step="0.5" value="'+c.sug+'" oninput="grpUpdate()" '+(can("late")?"":"disabled")+"></label>";
-  return '<div class="card" style="margin:0 0 8px"><b>'+esc(C(v.childId).name)+'</b> <span class="muted">#'+v.rno+" • "+esc(pn(v))+" • "+fMin(c.el)+"</span>"+priceHtml+feeHtml+"</div>"}).join("");
+  const itHtml=vItems(v).map(x=>'<div class="line"><span>'+esc(x.name)+(x.qty>1?" ×"+x.qty:"")+"</span><span>"+money(x.qty*x.price)+"</span></div>").join("");
+  return '<div class="card" style="margin:0 0 8px"><b>'+esc(C(v.childId).name)+'</b> <span class="muted">#'+v.rno+" • "+esc(pn(v))+" • "+fMin(c.el)+"</span>"+priceHtml+feeHtml+itHtml+"</div>"}).join("");
  modal("<h3>"+t("grpTitle")+" – "+esc(G(gid).name)+'</h3><div class="muted">'+t("checkOut")+": "+fTime(now)+"</div><hr>"+rows+(S.settings.pickupCheck?pickupBlock(vs[0]):"")+'<div class="line"><span>'+t("grpTotal")+'</span><span class="tot" id="gtot"></span></div><label class="opt"><input type="checkbox" id="cpr" checked><span>'+t("printReceipt")+'</span></label><div class="row"><button class="btn ok" onclick="confirmGroupCheckout()">'+t("confirmExit")+'</button><button class="btn" onclick="checkoutGroupModal(\''+gid+'\')">'+t("refreshTime")+'</button><button class="btn" onclick="closeModal()">'+t("cancel")+"</button></div>");
  grpUpdate();
 }
@@ -577,7 +608,7 @@ function grpVals(){
   const be=$("#gbp"+i),fe=$("#gfee"+i),pn_=e=>{const n=parseFloat(norm(e.value));return isFinite(n)&&n>=0?n:0};
   const base=(!v.prepaid&&!c.pkg&&c.sugBase!==undefined)?(be?pn_(be):c.sugBase):c.base;
   const fee=open?0:(fe?pn_(fe):0);
-  return {v:v,c:c,base:base,fee:fee,charged:(v.prepaid?0:base)+fee};
+  return {v:v,c:c,base:base,fee:fee,charged:(v.prepaid?0:base)+fee+vItemsTot(v)};
  });
 }
 function grpUpdate(){const e=$("#gtot");if(e)e.textContent=money(grpVals().reduce((s,x)=>s+x.charged,0))}
@@ -597,13 +628,14 @@ function confirmGroupCheckout(){
    else if(x.base>0)lines.push({type:"visit",name:pn(v)+" – "+nm,qty:1,price:x.base});
   }
   if(x.fee>0)lines.push({type:"late",name:t("late")+" – "+nm,qty:1,price:x.fee});
+  vItemsLines(v).forEach(l=>lines.push(l));
  });
  const fin=inv=>{
   vals.forEach(x=>{const v=x.v,c=x.c,open=v.planType==="open";
    v.checkOut=o.ts;v.status="out";v.pickup=pk;v.outBy=me.id;v.lateMin=c.late;v.suggestedFee=c.sug;v.lateFee=x.fee;v.lateNote="";
    if(open){v.price=c.base;v.units=c.units}else if(!v.prepaid&&!c.pkg&&x.base!==v.price){v.priceOrig=v.price;v.price=x.base}
    if(c.pkg&&c.pkg.use>0){pkgDeduct(v.guardianId,c.pkg.use,v.id);v.pkgMins=c.pkg.use}
-   v.total=x.base+x.fee;
+   v.total=x.base+x.fee;v.itemsTotal=vItemsTot(v);
    if(inv)v.exitInvoiceId=inv.id;
    log("check-out","#"+v.rno+" "+C(v.childId).name+" total "+v.total+" (group)");
   });
