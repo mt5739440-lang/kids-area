@@ -1,0 +1,28 @@
+# فحص تلقائي مع كل رفع: الاختبارات + فحص التبعيات + CodeQL (مجاني للمستودعات العامة)
+name: security-checks
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: "0 5 * * 1"      # كل اثنين أسبوعيًا
+permissions:
+  contents: read
+  security-events: write
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: npm ci
+      - run: node tests/run-all.js
+      - run: npm audit --audit-level=high
+  codeql:
+    runs-on: ubuntu-latest
+    continue-on-error: true   # في المستودعات الخاصة قد لا يتوفر CodeQL؛ لا نريد علامة حمراء بسببه
+    steps:
+      - uses: actions/checkout@v4
+      - uses: github/codeql-action/init@v3
+        with: { languages: javascript }
+      - uses: github/codeql-action/analyze@v3
