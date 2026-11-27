@@ -198,7 +198,7 @@ const can=p=>!!me&&PERMS[me.role].includes(p);
 const G=id=>S.guardians.find(g=>g.id===id)||{name:t("erasedName"),phone:""};
 const C=id=>S.children.find(c=>c.id===id)||{name:t("erasedName")};
 const pn=v=>v.planName[lang]||v.planName.ar;
-function toast(m){const e=$("#toast");e.textContent=m;e.style.display="block";clearTimeout(toast._t);toast._t=setTimeout(()=>e.style.display="none",Math.max(1,toastSec())*1000)}
+function toast(m){const e=$("#toast");e.innerHTML="<span></span><button type=\"button\" class=\"xbtn\" aria-label=\"close\" onclick=\"this.parentNode.style.display='none'\">✕</button>";e.firstChild.textContent=m;e.style.display="flex";clearTimeout(toast._t);toast._t=setTimeout(()=>e.style.display="none",Math.max(1,toastSec())*1000)}
 function modal(h){const m=$("#modal");m.innerHTML='<div class="dlg">'+h+"</div>";m.hidden=false}
 function closeModal(){const m=$("#modal");m.hidden=true;m.innerHTML=""}
 
@@ -2606,12 +2606,16 @@ let ALK={};
 function alertSec(){const v=S&&S.settings&&S.settings.alertSec;return v==null||isNaN(+v)?20:+v}
 function toastSec(){const v=S&&S.settings&&S.settings.toastSec;return v==null||isNaN(+v)?3:+v}
 /* اللافتة تظهر المدة المحددة ثم تختفي؛ تظهر من جديد عند فتح الشاشة أو عند تغيّر نصها (مثل زيادة العدد). 0 = ثابتة */
+function alertClose(btn){const el=btn.parentNode,k=alertKey(el);(ALK[k]||(ALK[k]={t:Date.now()})).x=true;el.style.display="none"}
+const alertKey=el=>el.textContent.replace(/✕/g,"").replace(/\s+/g," ").trim();
 function alertApply(){
  const sec=alertSec(),now=Date.now();
  document.querySelectorAll(".alertbox").forEach(el=>{
+  if(!el.querySelector(":scope>.xbtn")){const b=document.createElement("button");b.type="button";b.className="xbtn";b.setAttribute("aria-label","close");b.textContent="✕";b.onclick=function(){alertClose(b)};el.appendChild(b)}
+  const k=alertKey(el),r=ALK[k]||(ALK[k]={t:now});
+  if(r.x){el.style.display="none";return}
   if(sec<=0){el.style.display="";return}
-  const k=el.textContent.replace(/\s+/g," ").trim(),r=ALK[k]||(ALK[k]={t:now}),left=sec*1000-(now-r.t);
-  el.style.display=left<=0?"none":"";
+  el.style.display=sec*1000-(now-r.t)<=0?"none":"";
  });
 }
 try{new MutationObserver(alertApply).observe(document.body,{childList:true,subtree:true})}catch(e){}
