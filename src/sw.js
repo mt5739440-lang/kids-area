@@ -1,6 +1,6 @@
 /* SYSTEM KIDS AREA — app-shell cache so the app opens even without internet.
    Only same-origin files are cached; Supabase requests (other origin) are never touched. */
-const VER="ka-v20";
+const VER="ka-v21";
 const SHELL=["./","index.html","styles.css","app.js","manifest.webmanifest","icon-192.png","icon-512.png"];
 self.addEventListener("install",e=>{e.waitUntil(caches.open(VER).then(c=>c.addAll(SHELL)).then(()=>self.skipWaiting()))});
 self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==VER).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
