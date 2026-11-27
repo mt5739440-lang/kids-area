@@ -2609,6 +2609,15 @@ let ALK={};
 function alertSec(){const v=S&&S.settings&&S.settings.alertSec;return v==null||isNaN(+v)?20:+v}
 function toastSec(){const v=S&&S.settings&&S.settings.toastSec;return v==null||isNaN(+v)?3:+v}
 /* اللافتة تظهر المدة المحددة ثم تختفي؛ تظهر من جديد عند فتح الشاشة أو عند تغيّر نصها (مثل زيادة العدد). 0 = ثابتة */
+/* جداول الموبايل: نضيف اسم العمود لكل خلية فيعرضها CSS كبطاقة (بدون تمرير أفقي) */
+function tblLabels(){
+ document.querySelectorAll("#view table").forEach(tb=>{
+  const hs=[...tb.querySelectorAll("thead th")].map(h=>h.textContent.trim());if(!hs.length)return;
+  tb.classList.add("rt");
+  tb.querySelectorAll("tbody tr").forEach(tr=>{if(tr.dataset.l)return;[...tr.children].forEach((td,i)=>{if(td.tagName==="TD"&&td.colSpan===1)td.setAttribute("data-l",hs[i]||"")});tr.dataset.l="1"});
+ });
+}
+let _tl=0;try{new MutationObserver(()=>{if(_tl)return;_tl=requestAnimationFrame(()=>{_tl=0;tblLabels()})}).observe(document.body,{childList:true,subtree:true})}catch(e){}
 function alertClose(btn){const el=btn.parentNode,k=alertKey(el);(ALK[k]||(ALK[k]={t:Date.now()})).x=true;el.style.display="none"}
 const alertKey=el=>el.textContent.replace(/✕/g,"").replace(/\s+/g," ").trim();
 function alertApply(){

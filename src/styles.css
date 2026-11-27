@@ -141,6 +141,14 @@ button,.btn,.pbtn,nav button{touch-action:manipulation;-webkit-tap-highlight-col
  .cartbar{display:flex;position:fixed;inset-inline:10px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:40;justify-content:space-between;align-items:center;gap:10px;background:var(--pri);color:#fff;border:0;border-radius:14px;padding:12px 16px;font:inherit;font-weight:700;box-shadow:0 6px 18px rgba(0,0,0,.3);cursor:pointer}
  .cartbar b{font-size:17px}
  table{min-width:560px}
+ table.rt{min-width:0}
+ .rt thead{display:none}
+ .rt,.rt tbody{display:block}
+ .rt tr{display:block;border:1px solid var(--line);border-radius:12px;margin-bottom:10px;padding:6px 12px}
+ .rt td{display:flex;justify-content:space-between;align-items:center;gap:12px;border:0;padding:5px 0;text-align:end;font-size:14px}
+ .rt td::before{content:attr(data-l);color:var(--muted);font-size:12px;font-weight:600;flex:none;text-align:start}
+ .rt td[data-l=""]{justify-content:flex-start;flex-wrap:wrap}.rt td[data-l=""]::before{display:none}
+ .rt td:empty{display:none}
  .kpis{grid-template-columns:1fr 1fr}
 }
 @media(max-width:380px){.pgrid{grid-template-columns:1fr 1fr}.fgrid{grid-template-columns:1fr}}
