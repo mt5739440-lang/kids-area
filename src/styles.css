@@ -108,3 +108,39 @@ input:focus,select:focus,textarea:focus,.btn:focus-visible,nav button:focus-visi
 .xbtn:hover{opacity:1;background:rgba(0,0,0,.12)}
 #toast{display:none;align-items:center;gap:12px;padding-inline-end:12px}
 #toast .xbtn{position:static;flex:none;color:#fff}
+
+/* ===== تحسين الموبايل ===== */
+html{-webkit-text-size-adjust:100%}
+button,.btn,.pbtn,nav button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.cartbar{display:none}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px}
+@media(max-width:800px){
+ body{padding-bottom:env(safe-area-inset-bottom)}
+ header{position:sticky;top:0;z-index:30;padding:8px 12px;gap:8px;padding-top:max(8px,env(safe-area-inset-top))}
+ header h1{display:none}
+ header .brsel{flex:1 1 40%;min-width:0;min-height:38px;padding:4px 8px}
+ header .who{flex:1 1 100%;order:5;font-size:12px;line-height:1.2}
+ header .btn.sm{min-height:36px}
+ nav{position:sticky;top:var(--hh,92px);z-index:29;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;padding:8px 12px;gap:6px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+ nav::-webkit-scrollbar{display:none}
+ nav button{flex:none;white-space:nowrap;padding:10px 14px;min-height:42px}
+ main{padding:12px 12px 90px}
+ h2{font-size:18px}
+ input,select,textarea,label input,label select{font-size:16px;min-height:44px}
+ .btn{min-height:42px}.btn.sm{min-height:38px;padding:7px 12px}
+ .card{padding:12px;border-radius:12px}
+ .fgrid{grid-template-columns:1fr 1fr}
+ .row{gap:6px}
+ .pgrid{grid-template-columns:repeat(2,1fr)}
+ .pbtn{min-height:80px}
+ /* النوافذ: ورقة من أسفل الشاشة */
+ .ov{align-items:flex-end;padding:0}
+ .dlg{max-width:none;border-radius:18px 18px 0 0;max-height:92vh;padding:16px 14px calc(16px + env(safe-area-inset-bottom))}
+ #toast{bottom:calc(76px + env(safe-area-inset-bottom));max-width:92vw}
+ /* شريط السلة العائم في شاشة المبيعات */
+ .cartbar{display:flex;position:fixed;inset-inline:10px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:40;justify-content:space-between;align-items:center;gap:10px;background:var(--pri);color:#fff;border:0;border-radius:14px;padding:12px 16px;font:inherit;font-weight:700;box-shadow:0 6px 18px rgba(0,0,0,.3);cursor:pointer}
+ .cartbar b{font-size:17px}
+ table{min-width:560px}
+ .kpis{grid-template-columns:1fr 1fr}
+}
+@media(max-width:380px){.pgrid{grid-template-columns:1fr 1fr}.fgrid{grid-template-columns:1fr}}
