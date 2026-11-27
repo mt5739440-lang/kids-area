@@ -1,4 +1,4 @@
-/* © 2026 SYSTEM KIDS AREA. All rights reserved. Copying, redistribution or use without the owner's written permission is prohibited. */
+/* © 2026 Mohamed Tarek (SYSTEM KIDS AREA). All rights reserved. Copying, redistribution or use without the owner's written permission is prohibited. */
 
 "use strict";
 /* ============ i18n ============ */
