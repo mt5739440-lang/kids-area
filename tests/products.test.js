@@ -1,0 +1,18 @@
+const {JSDOM}=require("jsdom");const fs=require("fs");
+const dom=new JSDOM(fs.readFileSync(process.argv[2],"utf8"),{runScripts:"dangerously",url:"http://localhost/",pretendToBeVisual:true,beforeParse(w){w.confirm=()=>true;w.print=()=>{}}});
+const w=dom.window,E=c=>w.eval(c),$=s=>w.document.querySelector(s);let bad=0;const ok=(c,m)=>{console.log((c?"PASS ":"FAIL ")+m);if(!c)bad++};
+w.eval("window.printHTML=function(){};window.printA4=function(){}");
+$("#lu").value="u3";$("#lp").value="3333";w.doLogin();
+E("S.products.forEach(p=>{if(p.id==='pr5')p.stock=0})");
+E("go('pos')");const names=()=>[...w.document.querySelectorAll('.pbtn b')].map(x=>x.textContent);
+ok(!names().includes("شيبسي")&&names().includes("مياه"),"out-of-stock product hidden in POS");
+ok(E("S.products.some(p=>p.id==='pr5')"),"hidden product still exists");
+w.document.querySelector('.card .row button:last-child').click();
+ok(names().includes("شيبسي"),"toggle shows out-of-stock again");
+E("S.products.push({id:'gm1',name:{ar:'لعبة جديدة',en:'New game'},cat:'game',price:20,active:true})");
+E("S.invoices.push({id:'iX',no:1,lines:[{pid:'pr1',name:'مياه',qty:1,price:8,total:8}]})");
+w.productDelete('pr1');ok(E("S.products.some(p=>p.id==='pr1')"),"sold product cannot be deleted");
+w.productDelete('gm1');ok(!E("S.products.some(p=>p.id==='gm1')"),"unsold game deleted");
+E("K.cart=[{id:'pr2',qty:1}]");w.productDelete('pr2');ok(E("K.cart.length")===0&&!E("S.products.some(p=>p.id==='pr2')"),"deleted product leaves cart");
+E("go('settings')");ok($("#view").innerHTML.includes("productDelete"),"delete button in catalog");
+console.log(bad?"FAILED":"ALL OK");process.exit(bad?1:0);

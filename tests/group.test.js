@@ -1,0 +1,35 @@
+const {JSDOM}=require("jsdom");const fs=require("fs");
+const dom=new JSDOM(fs.readFileSync(process.argv[2],"utf8"),{runScripts:"dangerously",url:"http://localhost/",pretendToBeVisual:true,beforeParse(w){w.confirm=()=>true;w.print=()=>{}}});
+const w=dom.window,$=s=>w.document.querySelector(s),E=c=>w.eval(c);let bad=0;const ok=(c,m)=>{console.log((c?"PASS ":"FAIL ")+m);if(!c)bad++};
+w.eval("window.printed=[];window.printHTML=function(h){window.printed.push(h)};window.printA4=function(){};");
+$("#lu").value="u3";$("#lp").value="3333";w.doLogin();
+E("go('shift')");if($("#oc")){$("#oc").value="0";w.openShift()}
+E("S.settings.pickupCheck=false");
+E("S.visits.forEach(v=>{if(v.status==='in')v.status='out'})");
+E("S.guardians.push({id:'gG',name:'ولي تجربة',phone:'01099999999',notes:''});S.children.push({id:'cA',guardianId:'gG',name:'طفل أ',age:5,notes:''},{id:'cB',guardianId:'gG',name:'طفل ب',age:6,notes:''})");
+const mk=(id,c,r)=>E("S.visits.push({id:'"+id+"',rno:"+r+",childId:'"+c+"',guardianId:'gG',status:'in',planType:'fixed',minutes:60,price:70,checkIn:Date.now()-50*60000,prepaid:false,group:'grp1',lateFee:0,total:0,cashier:me.id,planName:{ar:'ساعة',en:'1h'}})");
+mk("vA","cA",9001);mk("vB","cB",9002);
+E("go('present')");
+const btns=[...w.document.querySelectorAll('#rows button')].filter(b=>/together|معًا/.test(b.textContent));
+ok(btns.length===2,"group button shown on both rows: "+btns.length);
+w.checkoutGroupModal('gG');
+ok(!!$("#gtot")&&$("#gbp0")&&$("#gbp1"),"group modal shows both children with price fields");
+ok(/140/.test($("#gtot").textContent.replace(/[^\d.]/g,"")),"total for both = 140: "+$("#gtot").textContent);
+$("#gbp1").value="50";w.grpUpdate();
+ok(/120/.test($("#gtot").textContent.replace(/[^\d.]/g,"")),"edited second price -> 120: "+$("#gtot").textContent);
+const inv0=E("S.invoices.length");$("#cpr").checked=true;
+w.confirmGroupCheckout();
+ok(!!$("#ptot"),"payment dialog opened once");
+w.payConfirm();
+ok(E("S.invoices.length")===inv0+1,"exactly ONE invoice for both children");
+const inv=E("S.invoices[S.invoices.length-1]");
+ok(inv.total===120&&inv.lines.length===2&&inv.visitIds.length===2,"invoice total 120, 2 lines, both visits linked");
+ok(E("S.visits.filter(v=>v.guardianId==='gG'&&v.status==='in').length")===0,"both children checked out");
+ok(E("S.visits.find(v=>v.id==='vB').price")===50&&E("S.visits.find(v=>v.id==='vB').exitInvoiceId")===inv.id,"visit B price and invoice link saved");
+const pr=E("window.printed");
+ok(pr.length===1,"exactly ONE thermal receipt printed: "+pr.length);
+ok(pr[0].includes("طفل أ")&&pr[0].includes("طفل ب")&&pr[0].includes("120"),"the one receipt lists both children and total 120");
+// single child: no group button
+mk("vC","cA",9003);E("go('present')");
+ok(![...w.document.querySelectorAll('#rows button')].some(b=>/together|معًا/.test(b.textContent)),"no group button for a single child");
+console.log(bad?"FAILED":"ALL OK");process.exit(bad?1:0);

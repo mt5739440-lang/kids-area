@@ -1,0 +1,16 @@
+const {JSDOM}=require("jsdom");const fs=require("fs");
+const dom=new JSDOM(fs.readFileSync(process.argv[2],"utf8"),{runScripts:"dangerously",url:"http://localhost/",pretendToBeVisual:true,beforeParse(w){w.confirm=()=>true;w.print=()=>{}}});
+const w=dom.window,E=c=>w.eval(c);let bad=0;const ok=(c,m)=>{console.log((c?"PASS ":"FAIL ")+m);if(!c)bad++};
+w.eval("window.printHTML=function(){};window.printA4=function(){}");
+w.document.querySelector("#lu").value="u3";w.document.querySelector("#lp").value="3333";w.doLogin();
+const run=(rows)=>{w.eval("IM=null");E("IM={name:'x',rows:"+JSON.stringify(rows)+",hasHead:true,map:imGuess("+JSON.stringify(rows[0])+")}");E("IM.plan=imPlan()")};
+run([["الاسم","الموبايل","رقم آخر","الطفل","العمر"],["سارة","01011111111","01022222222","ليلى","6"],["هبة","01033333333","","يوسف","5"],["نور","","01044444444","عمر","4"]]);
+ok(E("IM.map.p")===1&&E("IM.map.p2")===2,"headers mapped: phone + other number");
+ok(E("IM.plan.bad")===0,"row with only the other number is accepted");
+w.imGo();
+const s=E("S.guardians.find(g=>g.name==='سارة')");ok(s.phone==="01011111111"&&s.morePhones[0]==="01022222222","other number saved as extra phone");
+const n=E("S.guardians.find(g=>g.name==='نور')");ok(n.phone==="01044444444","only-other row uses it as primary");
+run([["الاسم","موبايل 2","الطفل"],["كريم","01055555555","علي"]]);
+ok(E("IM.map.p")===1&&E("IM.map.p2")===-1,"a lone 'موبايل 2' column is treated as the phone");
+ok(E("imGuess(['الاسم','الموبايل','الطفل']).p2")===-1,"no false p2");
+console.log(bad?"FAILED "+bad:"ALL OK");process.exit(bad?1:0);

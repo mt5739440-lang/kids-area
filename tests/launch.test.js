@@ -1,0 +1,22 @@
+const {JSDOM}=require("jsdom");const fs=require("fs");
+const html=fs.readFileSync(process.argv[2],"utf8");
+const dom=new JSDOM(html,{runScripts:"dangerously",url:"http://localhost/",pretendToBeVisual:true,beforeParse(w){w.confirm=()=>true;w.print=()=>{}}});
+const w=dom.window,$=s=>w.document.querySelector(s),E=c=>w.eval(c);
+w.eval("window.printHTML=function(){};window.printA4=function(){};");
+let bad=0;const ok=(c,m)=>{console.log((c?"PASS ":"FAIL ")+m);if(!c)bad++};
+$("#lu").value="u4";$("#lp").value="4444";w.doLogin();
+w.eval("views.backupBody()");
+ok(!!$("#lrcard"),"readiness card shown");
+ok(/✖ الرموز السرية التجريبية/.test($("#lrcard").textContent),"demo PINs flagged");
+ok(/✖ بيانات تجريبية/.test($("#lrcard").textContent),"demo data flagged");
+const prodBefore=E("S.products.length"),usersBefore=E("DB.shared.users.length"),pk=E("DB.shared.packages.length");
+w.lrWipe();
+ok(E("DB.shared.guardians.length")===0&&E("DB.shared.children.length")===0,"guardians and children cleared");
+ok(E("DB.branches.every(b=>DB.byBranch[b.id].invoices.length===0&&DB.byBranch[b.id].visits.length===0&&DB.byBranch[b.id].shifts.length===0)"),"invoices, visits, shifts cleared in all branches");
+ok(E("S.products.length")===prodBefore&&E("DB.shared.users.length")===usersBefore&&E("DB.shared.packages.length")===pk,"products, users and packages kept");
+ok(E("S.products.filter(p=>p.track).every(p=>p.stock===0)"),"tracked stock zeroed");
+ok(E("getBackups().some(b=>b.kind==='pre')"),"pre-wipe backup saved");
+ok(!!E("me"),"admin still logged in after wipe");
+w.go("entry");w.eval("render()");ok(!/NaN|undefined/.test($("#view").textContent),"entry screen renders after wipe");
+for(const v of ["history","pos","reports","shift","guardians","settings"]){try{w.go(v)}catch(e){ok(false,"screen "+v+" error "+e.message);continue}ok(!/NaN|undefined/.test($("#view").textContent),"screen "+v+" clean after wipe")}
+console.log(bad?"FAILED":"ALL PASS");process.exit(bad?1:0);

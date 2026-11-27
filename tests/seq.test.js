@@ -1,0 +1,11 @@
+const {JSDOM}=require("jsdom");const fs=require("fs");
+const html=fs.readFileSync(process.argv[2],"utf8");
+const dom=new JSDOM(html,{runScripts:"dangerously",url:"http://localhost/",pretendToBeVisual:true,beforeParse(w){w.confirm=()=>true;w.print=()=>{}}});
+const w=dom.window,E=c=>w.eval(c);let bad=0;const ok=(c,m)=>{console.log((c?"PASS ":"FAIL ")+m);if(!c)bad++};
+E("DB.byBranch.b1.seq.invoice=5;DB.byBranch.b1.seq.receipt=20;S=compose(CUR)");
+E("syApply")([{collection:"seq",id:"b1:_",branch_id:"b1",data:{_w:{invoice:99,receipt:3,visit:1}},deleted:false}]);
+ok(E("DB.byBranch.b1.seq.invoice")===99,"higher remote invoice counter wins (99)");
+ok(E("DB.byBranch.b1.seq.receipt")===20,"higher local receipt counter kept (20)");
+E("syApply")([{collection:"seq",id:"b1:_",branch_id:"b1",data:{_w:{invoice:50,receipt:90}},deleted:false}]);
+ok(E("DB.byBranch.b1.seq.invoice")===99&&E("DB.byBranch.b1.seq.receipt")===90,"counters never go backwards");
+console.log(bad?"FAILED":"ALL PASS");process.exit(bad?1:0);
