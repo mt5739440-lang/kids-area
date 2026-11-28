@@ -73,7 +73,8 @@ const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const AR="٠١٢٣٤٥٦٧٨٩",FA="۰۱۲۳۴۵۶۷۸۹";
 const norm=s=>String(s==null?"":s).replace(/[٠-٩]/g,d=>AR.indexOf(d)).replace(/[۰-۹]/g,d=>FA.indexOf(d)).trim().toLowerCase();
-const uid=()=>"x"+Math.random().toString(36).slice(2,10);
+const rnd=n=>{const c=(typeof crypto!=="undefined"&&crypto.getRandomValues)?crypto:(typeof window!=="undefined"&&window.msCrypto);const a=new Uint8Array(n);if(c&&c.getRandomValues)c.getRandomValues(a);else throw new Error("no secure random");return Array.from(a,b=>(b%36).toString(36)).join("")};
+const uid=()=>"x"+rnd(10);
 const loc=()=>lang==="ar"?"ar-EG-u-nu-latn":"en-GB";
 const TZ="Africa/Cairo";
 const fTime=ts=>new Date(ts).toLocaleTimeString(loc(),{timeZone:TZ,hour:"2-digit",minute:"2-digit",hour12:true});
@@ -2714,7 +2715,7 @@ function devInfo(){
   const ua=(typeof navigator!=="undefined"&&navigator.userAgent)||"";
   const os=/Android/i.test(ua)?"Android":/iPhone|iPad|iOS/i.test(ua)?"iOS":/Windows/i.test(ua)?"Windows":/Mac/i.test(ua)?"Mac":/Linux/i.test(ua)?"Linux":"Device";
   const br=/Edg\//.test(ua)?"Edge":/SamsungBrowser/.test(ua)?"Samsung":/Chrome\//.test(ua)?"Chrome":/Firefox\//.test(ua)?"Firefox":/Safari\//.test(ua)?"Safari":"Browser";
-  o={id:Math.random().toString(36).slice(2,6).toUpperCase(),name:os+" · "+br};
+  o={id:rnd(4).toUpperCase(),name:os+" · "+br};
   try{localStorage.setItem("ls_dev",JSON.stringify(o))}catch(e){}
  }
  return o;
