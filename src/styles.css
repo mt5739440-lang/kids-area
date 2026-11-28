@@ -152,3 +152,7 @@ button,.btn,.pbtn,nav button{touch-action:manipulation;-webkit-tap-highlight-col
  .kpis{grid-template-columns:1fr 1fr}
 }
 @media(max-width:380px){.pgrid{grid-template-columns:1fr 1fr}.fgrid{grid-template-columns:1fr}}
+
+.sybanner{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px;background:#fff4e5;color:#7a4b00;border:1px solid #f0c27a;border-radius:12px;padding:10px 12px;margin-bottom:12px;font-size:14px}
+.sybanner.dr{background:#e8f5ee;color:#0b5d36;border-color:#9fd5b6}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .sybanner{background:#3a2a0e;color:#ffd699;border-color:#7a5a1e}:root:not([data-theme="light"]) .sybanner.dr{background:#0f3322;color:#9be3bd;border-color:#1f6b46}}

@@ -5,7 +5,7 @@
 const D={
 appName:["نظام إدارة كيدز إيريا","Kids Area Management"],
 login:["تسجيل الدخول","Sign in"],user:["المستخدم","User"],pin:["الرقم السري (PIN)","PIN"],enter:["دخول","Sign in"],logout:["تسجيل الخروج","Log out"],
-wrongPin:["الرقم السري غير صحيح","Wrong PIN"],setupTitle:["إنشاء أول مدير","Create the first admin"],setupHint:["هذا أول تشغيل ولا يوجد أي مستخدم. أنشئ حساب المدير برقم سري من 4 أرقام تختاره أنت.","First run: no users exist. Create the admin account with a 4-digit PIN of your choice."],setupName:["اسم المدير","Admin name"],setupPin:["الرقم السري (4 أرقام)","PIN (4 digits)"],setupPin2:["أعد كتابة الرقم السري","Repeat PIN"],setupCreate:["إنشاء الحساب والدخول","Create account and sign in"],setupNoName:["اكتب اسم المدير","Enter the admin name"],setupPin4:["الرقم السري يجب أن يكون 4 أرقام","PIN must be 4 digits"],setupMismatch:["الرقمان غير متطابقين","PINs do not match"],setupWeak:["رقم سري ضعيف (مكرر أو متسلسل)، اختر غيره","Weak PIN (repeated or sequential), choose another"],setupJoin:["هذا جهاز فرع؟ اربطه بقاعدة البيانات المشتركة","Branch device? Connect to the shared database"],setupJoinHint:["بدل إنشاء مدير جديد، أدخل بيانات Supabase لسحب المستخدمين والبيانات الموجودة.","Instead of creating a new admin, enter the Supabase details to pull existing users and data."],setupJoinBtn:["ربط وسحب البيانات","Connect and pull data"],eraseBtn:["حذف بيانات العميل نهائيًا","Erase customer data permanently"],eraseSure:["سيتم حذف ولي الأمر وأطفاله وباقاتهم ورصيدهم نهائيًا من كل الفروع، وإخفاء اسمهم ورقمهم من الفواتير والحجوزات وسجل العمليات. الفواتير والمبالغ تبقى للمحاسبة بدون هوية. لا يمكن التراجع. متابعة؟","Guardian, children, packages and balance will be erased from all branches, and their name/phone hidden in invoices, bookings and the audit log. Invoices and amounts stay for accounting without identity. This cannot be undone. Continue?"],eraseSure2:["تأكيد أخير: حذف نهائي للعميل","Final confirmation: erase this customer"],eraseBal:["تنبيه: للعميل باقة فعّالة أو رصيد، وسيضيع بالحذف.","Warning: the customer has an active package or balance that will be lost."],eraseInside:["لا يمكن الحذف والطفل داخل المكان الآن. أنهِ الزيارة أولًا.","Cannot erase while a child is checked in. Check out first."],eraseDone:["تم حذف بيانات العميل","Customer data erased"],erasedName:["عميل محذوف","Erased customer"],pinLocked:["محاولات كثيرة خاطئة. انتظر","Too many wrong attempts. Wait"],secs:["ثانية","s"],idleOut:["تم تسجيل الخروج لعدم النشاط","Signed out due to inactivity"],alTitle:["مدة التنبيهات والرسائل","Alert and message duration"],alNote:["اللافتات الملوّنة (المتأخرون، المخزون، النسخ...) تختفي بعد المدة وتظهر من جديد عند فتح الشاشة أو تغيّر العدد. اكتب 0 لتبقى ثابتة.","Coloured banners (late kids, stock, backup...) hide after this time and reappear when a screen is opened or the count changes. Enter 0 to keep them fixed."],alBanner:["مدة ظهور اللافتات (ثانية، 0 = ثابتة)","Banner duration (seconds, 0 = fixed)"],alToast:["مدة الرسائل العابرة (ثانية)","Message duration (seconds)"],alBad:["اللافتات من 0 إلى 600 ثانية والرسائل من 1 إلى 30","Banners 0–600 s, messages 1–30 s"],kidOrders:["طلبات الطفل (كل المبيعات)","Child orders (all sales)"],kidOrdersNote:["تُضاف على حساب الطفل وتُحاسَب مع الوقت عند تسجيل الخروج.","Added to the child's bill and paid with the time at check-out."],kidNoOrders:["لا توجد طلبات بعد","No orders yet"],done:["تم","Done"],noPerm:["غير مسموح","Not allowed"],invFrom:["من تاريخ","From date"],invTo:["إلى تاريخ","To date"],invTimeFrom:["من الساعة","From time"],invTimeTo:["إلى الساعة","To time"],invNo:["رقم الفاتورة (رقم، مدى 100-120، أو 5,9)","Invoice no. (number, range 100-120, or 5,9)"],invAll:["الكل","All"],invSort:["الترتيب","Sort by"],sortNew:["الأحدث أولًا","Newest first"],sortOld:["الأقدم أولًا","Oldest first"],sortNoD:["الرقم: من الأكبر","Number: high to low"],sortNoA:["الرقم: من الأصغر","Number: low to high"],sortTotD:["المبلغ: الأعلى","Amount: highest"],sortTotA:["المبلغ: الأقل","Amount: lowest"],invReset:["إعادة الضبط (اليوم)","Reset (today)"],pcatManage:["إدارة التصنيفات","Manage categories"],pcatNote:["التصنيفان الأساسيان يمكن تغيير اسمهما لكن لا يُحذفان. أضف هنا أي تصنيف آخر (مثل: هدايا، حفلات).","The two built-in categories can be renamed but not deleted. Add any other category here (e.g. Gifts, Parties)."],pcatBuilt:["أساسي","built-in"],pcatAdd:["إضافة تصنيف","Add category"],pcatDup:["التصنيف موجود بالفعل","Category already exists"],pcatInUse:["لا يمكن الحذف: توجد منتجات بهذا التصنيف","Cannot delete: products use this category"],pcatDelConf:["حذف التصنيف؟","Delete this category?"],rpPayM:["طرق الدفع","Payment methods"],rp_cons:["مجمّع (كل الفروع)","Consolidated (all branches)"],rpExpTot:["إجمالي المصروفات","Total expenses"],rpNetAfter:["الصافي بعد المصروفات","Net after expenses"],kidCancelAll:["إلغاء كل الطلبات","Cancel all orders"],kidCancelConf:["إلغاء كل طلبات هذا الطفل؟","Cancel all of this child's orders?"],kidCancelDone:["تم إلغاء الطلبات","Orders cancelled"],alIdle:["مهلة الخروج التلقائي عند عدم النشاط (بالدقائق، 0 = إيقاف)","Auto sign-out after inactivity (minutes, 0 = off)"],bkDelOld:["حذف القديمة (إبقاء آخر 2)","Delete older (keep latest 2)"],bkDelAll:["حذف كل النسخ المحلية","Delete all local backups"],bkDelOne:["حذف","Delete"],bkDelConf:["حذف هذه النسخة الاحتياطية المحلية؟ لا يمكن التراجع.","Delete this local backup? This cannot be undone."],bkDelAllConf:["حذف كل النسخ الاحتياطية المحلية على هذا الجهاز؟ نزّل نسخة أولًا إن لم تفعل. لا يمكن التراجع.","Delete ALL local backups on this device? Download one first. This cannot be undone."],bkDeleted:["تم الحذف","Deleted"],rights:["© 2026 SYSTEM KIDS AREA — جميع الحقوق محفوظة","© 2026 SYSTEM KIDS AREA — All rights reserved"],
+wrongPin:["الرقم السري غير صحيح","Wrong PIN"],setupTitle:["إنشاء أول مدير","Create the first admin"],setupHint:["هذا أول تشغيل ولا يوجد أي مستخدم. أنشئ حساب المدير برقم سري من 4 أرقام تختاره أنت.","First run: no users exist. Create the admin account with a 4-digit PIN of your choice."],setupName:["اسم المدير","Admin name"],setupPin:["الرقم السري (4 أرقام)","PIN (4 digits)"],setupPin2:["أعد كتابة الرقم السري","Repeat PIN"],setupCreate:["إنشاء الحساب والدخول","Create account and sign in"],setupNoName:["اكتب اسم المدير","Enter the admin name"],setupPin4:["الرقم السري يجب أن يكون 4 أرقام","PIN must be 4 digits"],setupMismatch:["الرقمان غير متطابقين","PINs do not match"],setupWeak:["رقم سري ضعيف (مكرر أو متسلسل)، اختر غيره","Weak PIN (repeated or sequential), choose another"],setupJoin:["هذا جهاز فرع؟ اربطه بقاعدة البيانات المشتركة","Branch device? Connect to the shared database"],setupJoinHint:["بدل إنشاء مدير جديد، أدخل بيانات Supabase لسحب المستخدمين والبيانات الموجودة.","Instead of creating a new admin, enter the Supabase details to pull existing users and data."],setupJoinBtn:["ربط وسحب البيانات","Connect and pull data"],eraseBtn:["حذف بيانات العميل نهائيًا","Erase customer data permanently"],eraseSure:["سيتم حذف ولي الأمر وأطفاله وباقاتهم ورصيدهم نهائيًا من كل الفروع، وإخفاء اسمهم ورقمهم من الفواتير والحجوزات وسجل العمليات. الفواتير والمبالغ تبقى للمحاسبة بدون هوية. لا يمكن التراجع. متابعة؟","Guardian, children, packages and balance will be erased from all branches, and their name/phone hidden in invoices, bookings and the audit log. Invoices and amounts stay for accounting without identity. This cannot be undone. Continue?"],eraseSure2:["تأكيد أخير: حذف نهائي للعميل","Final confirmation: erase this customer"],eraseBal:["تنبيه: للعميل باقة فعّالة أو رصيد، وسيضيع بالحذف.","Warning: the customer has an active package or balance that will be lost."],eraseInside:["لا يمكن الحذف والطفل داخل المكان الآن. أنهِ الزيارة أولًا.","Cannot erase while a child is checked in. Check out first."],eraseDone:["تم حذف بيانات العميل","Customer data erased"],erasedName:["عميل محذوف","Erased customer"],pinLocked:["محاولات كثيرة خاطئة. انتظر","Too many wrong attempts. Wait"],secs:["ثانية","s"],idleOut:["تم تسجيل الخروج لعدم النشاط","Signed out due to inactivity"],alTitle:["مدة التنبيهات والرسائل","Alert and message duration"],alNote:["اللافتات الملوّنة (المتأخرون، المخزون، النسخ...) تختفي بعد المدة وتظهر من جديد عند فتح الشاشة أو تغيّر العدد. اكتب 0 لتبقى ثابتة.","Coloured banners (late kids, stock, backup...) hide after this time and reappear when a screen is opened or the count changes. Enter 0 to keep them fixed."],alBanner:["مدة ظهور اللافتات (ثانية، 0 = ثابتة)","Banner duration (seconds, 0 = fixed)"],alToast:["مدة الرسائل العابرة (ثانية)","Message duration (seconds)"],alBad:["اللافتات من 0 إلى 600 ثانية والرسائل من 1 إلى 30","Banners 0–600 s, messages 1–30 s"],kidOrders:["طلبات الطفل (كل المبيعات)","Child orders (all sales)"],kidOrdersNote:["تُضاف على حساب الطفل وتُحاسَب مع الوقت عند تسجيل الخروج.","Added to the child's bill and paid with the time at check-out."],kidNoOrders:["لا توجد طلبات بعد","No orders yet"],done:["تم","Done"],noPerm:["غير مسموح","Not allowed"],invFrom:["من تاريخ","From date"],invTo:["إلى تاريخ","To date"],invTimeFrom:["من الساعة","From time"],invTimeTo:["إلى الساعة","To time"],invNo:["رقم الفاتورة (رقم، مدى 100-120، أو 5,9)","Invoice no. (number, range 100-120, or 5,9)"],invAll:["الكل","All"],invSort:["الترتيب","Sort by"],sortNew:["الأحدث أولًا","Newest first"],sortOld:["الأقدم أولًا","Oldest first"],sortNoD:["الرقم: من الأكبر","Number: high to low"],sortNoA:["الرقم: من الأصغر","Number: low to high"],sortTotD:["المبلغ: الأعلى","Amount: highest"],sortTotA:["المبلغ: الأقل","Amount: lowest"],invReset:["إعادة الضبط (اليوم)","Reset (today)"],pcatManage:["إدارة التصنيفات","Manage categories"],pcatNote:["التصنيفان الأساسيان يمكن تغيير اسمهما لكن لا يُحذفان. أضف هنا أي تصنيف آخر (مثل: هدايا، حفلات).","The two built-in categories can be renamed but not deleted. Add any other category here (e.g. Gifts, Parties)."],pcatBuilt:["أساسي","built-in"],pcatAdd:["إضافة تصنيف","Add category"],pcatDup:["التصنيف موجود بالفعل","Category already exists"],pcatInUse:["لا يمكن الحذف: توجد منتجات بهذا التصنيف","Cannot delete: products use this category"],pcatDelConf:["حذف التصنيف؟","Delete this category?"],rpPayM:["طرق الدفع","Payment methods"],rp_cons:["مجمّع (كل الفروع)","Consolidated (all branches)"],rpExpTot:["إجمالي المصروفات","Total expenses"],rpNetAfter:["الصافي بعد المصروفات","Net after expenses"],kidCancelAll:["إلغاء كل الطلبات","Cancel all orders"],kidCancelConf:["إلغاء كل طلبات هذا الطفل؟","Cancel all of this child's orders?"],kidCancelDone:["تم إلغاء الطلبات","Orders cancelled"],alIdle:["مهلة الخروج التلقائي عند عدم النشاط (بالدقائق، 0 = إيقاف)","Auto sign-out after inactivity (minutes, 0 = off)"],bkDelOld:["حذف القديمة (إبقاء آخر 2)","Delete older (keep latest 2)"],bkDelAll:["حذف كل النسخ المحلية","Delete all local backups"],bkDelOne:["حذف","Delete"],bkDelConf:["حذف هذه النسخة الاحتياطية المحلية؟ لا يمكن التراجع.","Delete this local backup? This cannot be undone."],bkDelAllConf:["حذف كل النسخ الاحتياطية المحلية على هذا الجهاز؟ نزّل نسخة أولًا إن لم تفعل. لا يمكن التراجع.","Delete ALL local backups on this device? Download one first. This cannot be undone."],bkDeleted:["تم الحذف","Deleted"],device:["الجهاز","Device"],devTitle:["هذا الجهاز","This device"],devNote:["اسم يظهر في سجل التدقيق بجانب كل عملية دخول أو تعديل، لتعرف من فتح من أي جهاز. غيّره لاسم واضح مثل «كاشير سموحة 1».","Shown in the audit log next to every sign-in or change so you know who used which device. Use a clear name, e.g. “Smouha cashier 1”."],devName:["اسم الجهاز","Device name"],devList:["الأجهزة التي استُخدمت","Devices used"],devListNote:["مجمّعة من سجل التدقيق لهذا الفرع.","Collected from this branch's audit log."],devLastUser:["آخر مستخدم","Last user"],devLastSeen:["آخر نشاط","Last activity"],devLogins:["مرات الدخول","Sign-ins"],devUsers:["المستخدمون","Users"],syBanOff:["لا يوجد اتصال بالقاعدة. تعمل على بيانات هذا الجهاز ولن ترى ما يسجله الآخرون حتى يعود الاتصال.","No connection. You are working on this device's data and won't see others' changes until it returns."],syBanOffN:["لا يوجد اتصال. # تغيير محفوظ على هذا الجهاز ولم يُرسل بعد.","No connection. # change(s) saved on this device, not uploaded yet."],syBanStale:["# تغيير لم يُرسل بعد وتأخر أكثر من دقيقتين.","# change(s) still not uploaded after more than 2 minutes."],syBanAuth:["انتهت جلسة المزامنة. سجّل الدخول من جديد من الإعدادات.","Sync session expired. Sign in again from Settings."],syDetails:["التفاصيل","Details"],syRetry:["إعادة المحاولة","Retry"],syPendTitle:["ما لم يُزامَن بعد","Not synced yet"],syPendNote:["هذه التغييرات محفوظة على هذا الجهاز وستُرفع تلقائيًا عند عودة الاتصال. لا تمسح بيانات المتصفح ولا تفك التطبيق قبل ذلك.","These changes are saved on this device and will upload automatically when the connection returns. Do not clear browser data or uninstall the app before then."],syPendNone:["لا توجد تغييرات معلّقة.","Nothing pending."],syOldest:["أقدم تغيير","Oldest change"],syLose:["يوجد # تغيير لم يُرسل وسيضيع إن استبدلت البيانات.","# change(s) not yet uploaded will be lost if you replace data."],agoNow:["الآن","just now"],agoMin:["دقيقة","min ago"],agoHour:["ساعة","h ago"],agoDay:["يوم","d ago"],sbkUnknown:["نسخة Supabase الأسبوعية: جارٍ التحقق…","Weekly Supabase backup: checking…"],sbkMissing:["النسخة الأسبوعية على Supabase غير مفعّلة: شغّل ملف database/05-weekly-backup.sql","Weekly Supabase backup is not enabled: run database/05-weekly-backup.sql"],sbkNone:["مفعّلة لكن لم تؤخذ أول نسخة بعد","Enabled, but no snapshot taken yet"],sbkLast:["آخر نسخة على Supabase","Last Supabase snapshot"],sbkCount:["عدد اللقطات المحفوظة","Snapshots kept"],drTitle:["تقرير يوم","Daily report"],drTitle2:["تقرير اليوم للإدارة","Daily report to management"],drNote:["عند نهاية اليوم يظهر تنبيه للمشرف أو المدير لإرسال ملخص اليوم بواتساب لرقم الإدارة بضغطة واحدة. الإرسال لا يتم تلقائيًا بلا ضغط (قيد واتساب).","At the end of the day a prompt appears for supervisors/admins to send the day's summary by WhatsApp to the management number in one tap. It is not sent without a tap (WhatsApp limitation)."],drPhone:["رقم واتساب الإدارة","Management WhatsApp number"],drHour:["يظهر التنبيه بعد الساعة (0-23)","Prompt appears after hour (0-23)"],drReady:["تقرير يوم # جاهز للإرسال للإدارة","Report for # is ready to send to management"],drSend:["إرسال بواتساب","Send on WhatsApp"],drSendNow:["إرسال تقرير اليوم الآن","Send today's report now"],drCopy:["نسخ النص","Copy text"],drLater:["لاحقًا","Later"],drNoPhone:["أدخل رقم واتساب الإدارة في الإعدادات أولًا","Enter the management WhatsApp number in Settings first"],copied:["تم النسخ","Copied"],rights:["© 2026 SYSTEM KIDS AREA — جميع الحقوق محفوظة","© 2026 SYSTEM KIDS AREA — All rights reserved"],
 present:["الأطفال الموجودين الآن","Children inside now"],newEntry:["تسجيل دخول","New check-in"],history:["الزيارات والتقارير","Visits & reports"],
 guardians:["أولياء الأمور والأطفال","Guardians & children"],settings:["الإعدادات","Settings"],users:["المستخدمين","Users"],audit:["سجل التدقيق","Audit log"],
 searchHere:["ابحث بالاسم أو الموبايل أو رقم الإيصال","Search name, phone or receipt no."],
@@ -190,7 +190,7 @@ function save(){
  try{const a=JSON.parse(localStorage.getItem(BKKEY)||"[]");while(a.length){a.shift();try{localStorage.setItem(BKKEY,JSON.stringify(a))}catch(e){}try{localStorage.setItem(DBKEY,txt);return}catch(e){}}}catch(e){}
  toast("تعذّر الحفظ في المتصفح");
 }
-function log(action,details){S.audit.push({ts:Date.now(),user:me?me.name:"-",action:action,details:details||""});if(S.audit.length>5000)S.audit.shift()}
+function log(action,details){S.audit.push({ts:Date.now(),user:me?me.name:"-",action:action,details:details||"",dev:devLabel()});if(S.audit.length>5000)S.audit.shift()}
 let me=(()=>{try{const id=sessionStorage.getItem("ls_user");return id?S.users.find(u=>u.id===id&&u.active)||null:null}catch(e){return null}})();
 function bindBranch(){if(!me)return;let b=me.branch==="all"?CUR:me.branch;if(!DB.branches.some(x=>x.id===b))b=DB.branches[0].id;if(b!==CUR)enterBranch(b)}
 bindBranch();
@@ -278,6 +278,7 @@ function render(){
   items.map(x=>'<button class="'+(view===x[0]?"on":"")+'" onclick="go(\''+x[0]+'\')">'+t(x[1])+"</button>").join("")+'</nav><main id="view"></main>';
  {const cb=document.getElementById("cartbar");if(cb&&view!=="pos")cb.remove();const hd=document.querySelector("header");if(hd)document.documentElement.style.setProperty("--hh",hd.offsetHeight+"px");const on=document.querySelector("nav button.on");if(on&&on.scrollIntoView)try{on.scrollIntoView({inline:"center",block:"nearest"})}catch(e){}}
  views[view]();
+ try{syBannerApply();drBannerApply()}catch(e){}
 }
 function renderLogin(){
  const act=S.users.filter(u=>u.active);
@@ -2296,10 +2297,10 @@ function auditList(){
 }
 views.audit=function(){
  const A=window._af||(window._af={u:"",q:"",from:"",to:""}),list=auditList(),users=Array.from(new Set(S.audit.map(a=>a.user))).sort();
- $("#view").innerHTML='<div class="bar"><h2>'+t("audit")+(DB.branches.length>1?" – "+esc(branchName(CUR)):"")+'</h2><div class="row" style="margin:0"><button class="btn sm" onclick="auditXlsx()">'+t("auditXlsx")+'</button><button class="btn sm" onclick="auditPdf()">'+t("auditPrint")+'</button></div></div><div class="card"><div class="row" style="margin:0"><label style="margin:0">'+t("auditUser")+' <select onchange="_af.u=this.value;render()"><option value="">'+t("auditAll")+"</option>"+users.map(u=>'<option '+(A.u===u?"selected ":"")+'value="'+esc(u)+'">'+esc(u)+"</option>").join("")+'</select></label><input id="aq" style="max-width:240px" placeholder="'+t("auditSearch")+'" value="'+esc(A.q)+'" onchange="_af.q=this.value;render()"><label style="margin:0">'+t("rpFrom")+' <input type="date" value="'+A.from+'" onchange="_af.from=this.value;render()"></label><label style="margin:0">'+t("rpTo")+' <input type="date" value="'+A.to+'" onchange="_af.to=this.value;render()"></label><span class="muted">'+t("auditShown")+": "+Math.min(list.length,500)+" / "+list.length+'</span></div></div><div class="card"><table><thead><tr><th>'+t("time")+"</th><th>"+t("user")+"</th><th>"+t("action")+"</th><th>"+t("details")+"</th></tr></thead><tbody>"+
- list.slice(0,500).map(a=>"<tr><td>"+fDate(a.ts)+" "+fTime(a.ts)+"</td><td>"+esc(a.user)+"</td><td>"+esc(a.action)+"</td><td>"+esc(a.details)+"</td></tr>").join("")+"</tbody></table></div>";
+ $("#view").innerHTML='<div class="bar"><h2>'+t("audit")+(DB.branches.length>1?" – "+esc(branchName(CUR)):"")+'</h2><div class="row" style="margin:0"><button class="btn sm" onclick="auditXlsx()">'+t("auditXlsx")+'</button><button class="btn sm" onclick="auditPdf()">'+t("auditPrint")+'</button></div></div>'+devAudit()+'<div class="card"><div class="row" style="margin:0"><label style="margin:0">'+t("auditUser")+' <select onchange="_af.u=this.value;render()"><option value="">'+t("auditAll")+"</option>"+users.map(u=>'<option '+(A.u===u?"selected ":"")+'value="'+esc(u)+'">'+esc(u)+"</option>").join("")+'</select></label><input id="aq" style="max-width:240px" placeholder="'+t("auditSearch")+'" value="'+esc(A.q)+'" onchange="_af.q=this.value;render()"><label style="margin:0">'+t("rpFrom")+' <input type="date" value="'+A.from+'" onchange="_af.from=this.value;render()"></label><label style="margin:0">'+t("rpTo")+' <input type="date" value="'+A.to+'" onchange="_af.to=this.value;render()"></label><span class="muted">'+t("auditShown")+": "+Math.min(list.length,500)+" / "+list.length+'</span></div></div><div class="card"><table><thead><tr><th>'+t("time")+"</th><th>"+t("user")+"</th><th>"+t("action")+"</th><th>"+t("details")+"</th><th>"+t("device")+"</th></tr></thead><tbody>"+
+ list.slice(0,500).map(a=>"<tr><td>"+fDate(a.ts)+" "+fTime(a.ts)+"</td><td>"+esc(a.user)+"</td><td>"+esc(a.action)+"</td><td>"+esc(a.details)+"</td><td>"+esc(a.dev||"")+"</td></tr>").join("")+"</tbody></table></div>";
 };
-function auditSheet(){return {name:t("audit"),head:[t("time"),t("user"),t("action"),t("details")],rows:auditList().map(a=>[fDate(a.ts)+" "+fTime(a.ts),a.user,a.action,a.details])}}
+function auditSheet(){return {name:t("audit"),head:[t("time"),t("user"),t("action"),t("details"),t("device")],rows:auditList().map(a=>[fDate(a.ts)+" "+fTime(a.ts),a.user,a.action,a.details,a.dev||""])}}
 function auditXlsx(){if(!can("audit"))return;log("export xlsx","audit");save();downloadXlsx(t("audit")+" "+branchName(CUR)+" "+dayKey(Date.now())+".xlsx",[auditSheet()])}
 function auditPdf(){if(!can("audit"))return;const sh=auditSheet();log("print report","audit");save();printA4("<h1>"+esc(S.settings.venue)+"</h1><h2>"+esc(t("audit")+" – "+branchName(CUR))+"</h2>"+rptTable(sh))}
 
@@ -2342,10 +2343,10 @@ function syBr(id){const i=id.indexOf(":");if(i<0)return null;const b=id.slice(0,
 function syDiff(){
  syncOut();const seen={};
  syEach((c,id,br,d)=>{const key=c+"|"+id;seen[key]=1;const h=hsh(canon(d));
-  if(SYHH[key]!==h){SYQQ[key]={collection:c,id:id,branch_id:br,data:d,deleted:false};SYHH[key]=h}});
+  if(SYHH[key]!==h){SYQQ[key]={collection:c,id:id,branch_id:br,data:d,deleted:false,ts:Date.now()};SYHH[key]=h}});
  Object.keys(SYHH).forEach(key=>{if(!seen[key]){const i=key.indexOf("|"),c=key.slice(0,i),id=key.slice(i+1);
   if(id.slice(-2)===":_"||id==="_"||c==="_meta"||!syAllowed(syBr(id)||SY.branch||null)&&syBr(id)){return}
-  SYQQ[key]={collection:c,id:id,branch_id:syBr(id),data:{},deleted:true};delete SYHH[key]}});
+  SYQQ[key]={collection:c,id:id,branch_id:syBr(id),data:{},deleted:true,ts:Date.now()};delete SYHH[key]}});
 }
 async function syReq(m,path,body,hdr){
  const go=()=>{const h=Object.assign({apikey:SY.key,"Content-Type":"application/json"},hdr||{});if(SY.tok)h.Authorization="Bearer "+SY.tok;
@@ -2452,7 +2453,7 @@ async function syUpload(){
 }
 async function syJoinDB(){
  if(!can("settings")&&!setupNeeded())return;const f=syFields();if(!(await syCheck(f)))return;
- if(!confirm(t("syConfJoin")))return;
+ {const pn=Object.keys(SYQQ).length;if(!confirm(t("syConfJoin")+(pn?"\n\n⚠ "+t("syLose").replace("#",pn):"")))return}
  const keep=JSON.stringify(DB),qk=JSON.stringify(SYQQ),hk=JSON.stringify(SYHH);
  const wipe=o=>Object.keys(o).forEach(k=>{if(Array.isArray(o[k]))o[k]=[]});
  wipe(DB.shared);DB.branches.forEach(b=>wipe(DB.byBranch[b.id]));
@@ -2468,7 +2469,7 @@ function syDisconnect(){if(!can("settings"))return;SY.on=false;SY.tok=null;SY.re
 function syCard(){
  const n=Object.keys(SYQQ).length;
  return '<div class="card" id="sycard"><h3>'+t("syTitle")+'</h3><div class="muted">'+t("syWarn")+"</div>"+
- (SY.on?'<div class="kpis">'+kpi(t("syLast"),SY.last?fDate(SY.last)+" "+fTime(SY.last):t("syNever"))+kpi(t("syQueue"),n)+kpi("",syChipTxt())+"</div>":"")+
+ (SY.on?'<div class="muted" id="sybk">'+syBkTxt()+"</div>":"")+(SY.on?'<div class="kpis">'+kpi(t("syLast"),SY.last?fDate(SY.last)+" "+fTime(SY.last):t("syNever"))+kpi(t("syQueue"),n)+kpi("",syChipTxt())+"</div>":"")+
  '<label>'+t("syUrl")+'<input id="syu" dir="ltr" value="'+esc(SY.url)+'"></label><label>'+t("syKey")+'<input id="syk" dir="ltr" value="'+esc(SY.key)+'"></label>'+
  '<label>'+t("syEmail")+'<input id="sye" dir="ltr" value="'+esc(SY.email)+'"></label><label>'+t("syPass")+'<input id="syp" type="password" dir="ltr"></label>'+
  '<div class="muted" id="symsg"></div><div class="row"><button class="btn" onclick="syTest()">'+t("syTest")+'</button><button class="btn pri" onclick="syUpload()">'+t("syUp")+'</button><button class="btn" onclick="syJoinDB()">'+t("syJoin")+"</button>"+
@@ -2704,6 +2705,143 @@ function saveAlertPrefs(){
 }
 {const _al3=views.settingsBody;views.settingsBody=function(){_al3();(window._hT||$("#view")).insertAdjacentHTML("beforeend",alertsCard())}}
 {const _bk3=views.backupBody;views.backupBody=function(){_bk3();if(can("settings"))(window._hT||$("#view")).insertAdjacentHTML("beforeend",imCard())}}
+
+
+/* ============ أجهزة الدخول: من فتح من أي جهاز ============ */
+function devInfo(){
+ let o=null;try{o=JSON.parse(localStorage.getItem("ls_dev")||"null")}catch(e){}
+ if(!o||!o.id){
+  const ua=(typeof navigator!=="undefined"&&navigator.userAgent)||"";
+  const os=/Android/i.test(ua)?"Android":/iPhone|iPad|iOS/i.test(ua)?"iOS":/Windows/i.test(ua)?"Windows":/Mac/i.test(ua)?"Mac":/Linux/i.test(ua)?"Linux":"Device";
+  const br=/Edg\//.test(ua)?"Edge":/SamsungBrowser/.test(ua)?"Samsung":/Chrome\//.test(ua)?"Chrome":/Firefox\//.test(ua)?"Firefox":/Safari\//.test(ua)?"Safari":"Browser";
+  o={id:Math.random().toString(36).slice(2,6).toUpperCase(),name:os+" · "+br};
+  try{localStorage.setItem("ls_dev",JSON.stringify(o))}catch(e){}
+ }
+ return o;
+}
+function devLabel(){try{const d=devInfo();return d.name+" #"+d.id}catch(e){return ""}}
+function devSave(){
+ if(!can("settings"))return;const n=($("#dvn").value||"").trim().slice(0,40);if(!n){toast(t("needName"));return}
+ const d=devInfo();d.name=n;try{localStorage.setItem("ls_dev",JSON.stringify(d))}catch(e){}
+ log("device renamed",devLabel());save();toast(t("saved"));render();
+}
+function devCard(){
+ if(!can("settings"))return "";
+ return '<div class="card"><h3>'+t("devTitle")+'</h3><div class="muted">'+t("devNote")+'</div><label>'+t("devName")+'<input id="dvn" value="'+esc(devInfo().name)+'" maxlength="40"></label><div class="muted">#'+esc(devInfo().id)+'</div><div class="row"><button class="btn pri" onclick="devSave()">'+t("save")+"</button></div></div>";
+}
+function devAudit(){
+ const m={};
+ S.audit.forEach(a=>{if(!a.dev)return;const d=m[a.dev]||(m[a.dev]={dev:a.dev,last:0,user:"",logins:0,users:{}});
+  if(a.ts>=d.last){d.last=a.ts;d.user=a.user}d.users[a.user]=1;if(a.action==="login")d.logins++});
+ const rows=Object.values(m).sort((x,y)=>y.last-x.last);
+ return '<div class="card"><h3>'+t("devList")+'</h3><div class="muted">'+t("devListNote")+"</div>"+(rows.length?"<table><thead><tr><th>"+t("device")+"</th><th>"+t("devLastUser")+"</th><th>"+t("devLastSeen")+"</th><th>"+t("devLogins")+"</th><th>"+t("devUsers")+"</th></tr></thead><tbody>"+
+  rows.map(d=>"<tr><td>"+esc(d.dev)+"</td><td>"+esc(d.user)+"</td><td>"+fDate(d.last)+" "+fTime(d.last)+"</td><td>"+d.logins+"</td><td>"+esc(Object.keys(d.users).join("، "))+"</td></tr>").join("")+"</tbody></table>":'<div class="muted">'+t("none")+"</div>")+"</div>";
+}
+
+/* ============ وضع بدون إنترنت: إظهار ما لم يُزامَن ============ */
+try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
+const SY_LBL={invoices:["فواتير","Invoices"],visits:["زيارات","Visits"],guardians:["أولياء أمور","Guardians"],children:["أطفال","Children"],shifts:["ورديات","Shifts"],expenses:["مصروفات","Expenses"],products:["منتجات","Products"],audit:["سجل التدقيق","Audit log"],bookings:["حجوزات","Bookings"],subs:["اشتراكات","Subscriptions"],balances:["أرصدة","Balances"],walletTx:["حركات المحفظة","Wallet"],users:["مستخدمون","Users"],attendance:["حضور","Attendance"],coupons:["كوبونات","Coupons"],couponUses:["استخدام كوبونات","Coupon uses"],packages:["باقات","Packages"],parties:["حفلات","Parties"],inventory:["مخزون","Inventory"],_meta:["إعدادات","Settings"]};
+const syLbl=c=>SY_LBL[c]?SY_LBL[c][lang==="ar"?0:1]:c;
+function syPendInfo(){
+ const ks=Object.keys(SYQQ),by={};let old=0;
+ ks.forEach(k=>{const q=SYQQ[k];by[q.collection]=(by[q.collection]||0)+1;if(q.ts&&(!old||q.ts<old))old=q.ts});
+ return {n:ks.length,by:by,oldest:old};
+}
+function agoTxt(ts){
+ const m=Math.max(0,Math.round((Date.now()-ts)/60000));
+ if(m<1)return t("agoNow");if(m<60)return m+" "+t("agoMin");const h=Math.round(m/60);if(h<48)return h+" "+t("agoHour");return Math.round(h/24)+" "+t("agoDay");
+}
+function syBannerApply(){
+ const old=document.getElementById("sybanner"),v=document.getElementById("view");
+ if(!me||!v||!SY.on){if(old)old.remove();return}
+ const p=syPendInfo(),stale=p.n>0&&p.oldest&&Date.now()-p.oldest>120000;
+ const offline=SYSTAT==="off"||(typeof navigator!=="undefined"&&navigator.onLine===false),auth=SYSTAT==="auth";
+ if(!offline&&!auth&&!stale){if(old)old.remove();return}
+ const msg=auth?t("syBanAuth"):offline?(p.n?t("syBanOffN").replace("#",p.n):t("syBanOff")):t("syBanStale").replace("#",p.n);
+ const html='<div id="sybanner" class="sybanner"><span>⚠ '+esc(msg)+(SY.last?" · "+t("syLast")+": "+agoTxt(SY.last):"")+'</span><span><button class="btn sm" onclick="syPendModal()">'+t("syDetails")+'</button> <button class="btn sm" onclick="syRun()">'+t("syRetry")+"</button></span></div>";
+ if(old)old.outerHTML=html;else v.insertAdjacentHTML("afterbegin",html);
+}
+function syPendModal(){
+ const p=syPendInfo();
+ modal("<h3>"+t("syPendTitle")+'</h3><div class="muted">'+t("syPendNote")+"</div><hr>"+
+  (p.n?Object.keys(p.by).sort((a,b)=>p.by[b]-p.by[a]).map(c=>'<div class="line"><span>'+esc(syLbl(c))+"</span><b>"+p.by[c]+"</b></div>").join("")+'<div class="line"><span>'+t("total")+"</span><b>"+p.n+"</b></div>"+(p.oldest?'<div class="muted">'+t("syOldest")+": "+agoTxt(p.oldest)+"</div>":""):'<div class="muted">'+t("syPendNone")+"</div>")+
+  '<div class="muted">'+t("syLast")+": "+(SY.last?fDate(SY.last)+" "+fTime(SY.last):t("syNever"))+(SY.err?" · "+esc(SY.err):"")+'</div><div class="row"><button class="btn pri" onclick="syRun();closeModal()">'+t("syRetry")+'</button><button class="btn" onclick="closeModal()">'+t("close")+"</button></div>");
+}
+{const _spaint=syPaint;syPaint=function(){_spaint();try{syBannerApply();syBkFetch()}catch(e){}}}
+window.addEventListener("offline",()=>{if(SY.on){SYSTAT="off";try{syPaint()}catch(e){}}});
+window.addEventListener("online",()=>{setTimeout(()=>{try{syBannerApply()}catch(e){}},3000)});
+
+/* ============ نسخة Supabase الأسبوعية: عرض حالتها للمدير ============ */
+let SRVBK=null,srvBkAt=0;
+function syBkTxt(){
+ if(!SRVBK)return t("sbkUnknown");
+ if(SRVBK.missing)return "⚠ "+t("sbkMissing");
+ if(!SRVBK.at)return "⚠ "+t("sbkNone");
+ const days=(Date.now()-new Date(SRVBK.at).getTime())/86400000;
+ return (days>9?"⚠ ":"✓ ")+t("sbkLast")+": "+fDate(new Date(SRVBK.at).getTime())+" "+fTime(new Date(SRVBK.at).getTime())+" · "+t("sbkCount")+": "+SRVBK.total;
+}
+async function syBkFetch(){
+ if(!SY.on||!SY.tok||!me||!can("settings")||Date.now()-srvBkAt<600000)return;srvBkAt=Date.now();
+ try{
+  const r=await syReq("POST","/rest/v1/rpc/backup_status",{});
+  if(r.status===404||(r.json&&r.json.code==="PGRST202"))SRVBK={missing:true};
+  else if(r.ok){const x=Array.isArray(r.json)?r.json[0]:r.json;SRVBK=x?{at:x.taken_at,total:x.total}:{at:null,total:0}}
+  const e=document.getElementById("sybk");if(e)e.textContent=syBkTxt();
+ }catch(e){}
+}
+
+/* ============ تقرير اليوم للإدارة (واتساب) ============ */
+function drFigures(day,all){
+ const brs=all&&can("branches")?DB.branches:[{id:CUR,name:branchName(CUR)}];
+ return brs.map(br=>withBranch(br.id,()=>{
+  const R_=repData(day,day),e=r2((S.expenses||[]).filter(x=>!x.void&&dayKey(x.at)===day).reduce((s,x)=>s+x.amount,0));
+  return {name:br.name,T:R_.tot,exp:e};
+ }));
+}
+function drText(day,all){
+ const f=drFigures(day,all);
+ const blk=p=>(f.length>1?"\n▪ "+p.name:"")+"\n• "+t("rpNet")+": "+money(p.T.net)+" ("+p.T.inv+" "+t("rpInv")+")\n• "+t("rpCash")+" "+money(p.T.cash)+" | "+t("rpCard")+" "+money(p.T.card)+" | "+t("rpWallet")+" "+money(p.T.wallet)+" | "+t("rpCredit")+" "+money(p.T.credit)+"\n• "+t("rpDisc")+" "+money(p.T.disc)+" | "+t("rpRef")+" "+money(p.T.refunds)+"\n• "+t("rpExpTot")+" "+money(p.exp)+" → "+t("rpNetAfter")+" "+money(r2(p.T.net-p.exp))+"\n• "+t("rpVisitsN")+": "+p.T.visits;
+ let h="📊 "+t("drTitle")+" "+day+" – "+S.settings.venue+f.map(blk).join("\n");
+ if(f.length>1){const sm=g=>r2(f.reduce((a,p)=>a+g(p),0));h+="\n\n▪ "+t("rpTotal")+"\n• "+t("rpNet")+": "+money(sm(p=>p.T.net))+"\n• "+t("rpExpTot")+" "+money(sm(p=>p.exp))+" → "+t("rpNetAfter")+" "+money(sm(p=>p.T.net-p.exp))}
+ return h;
+}
+function drSend(day){
+ if(!can("reports"))return;
+ const ph=S.settings.mgmtPhone;if(!waNum(ph)){toast(t("drNoPhone"));return}
+ waOpen(ph,drText(day,true));S.settings.drSent=day;log("daily report sent",day);save();render();
+}
+function drCopy(day){
+ const tx=drText(day,true);
+ try{navigator.clipboard.writeText(tx).then(()=>toast(t("copied")),()=>{prompt("",tx)})}catch(e){prompt("",tx)}
+}
+function drDay(){
+ if(!me||!can("reports")||!waNum(S.settings.mgmtPhone))return null;
+ const now=new Date(),td=dayKey(Date.now()),yd=dayKey(Date.now()-86400000),hr=+(S.settings.drHour==null?22:S.settings.drHour);
+ const hour=+now.toLocaleTimeString("en-GB",{timeZone:TZ,hour:"2-digit",hour12:false}).slice(0,2);
+ const has=d=>S.invoices.some(i=>dayKey(i.createdAt)===d&&!i.void);
+ if(hour>=hr&&has(td)&&S.settings.drSent!==td)return td;
+ if(has(yd)&&S.settings.drSent!==yd&&S.settings.drSent!==td&&hour<hr)return yd;
+ return null;
+}
+function drBannerApply(){
+ const old=document.getElementById("drbanner"),v=document.getElementById("view"),d=drDay();
+ if(!v||!d||window._drNo===d||!(view==="present"||view==="shift")){if(old)old.remove();return}
+ const html='<div id="drbanner" class="sybanner dr"><span>📊 '+esc(t("drReady").replace("#",d))+'</span><span><button class="btn sm pri" onclick="drSend(\''+d+'\')">'+t("drSend")+'</button> <button class="btn sm" onclick="window._drNo=\''+d+'\';drBannerApply()">'+t("drLater")+"</button></span></div>";
+ if(old)old.outerHTML=html;else v.insertAdjacentHTML("afterbegin",html);
+}
+function drCard(){
+ if(!can("settings"))return "";
+ const td=dayKey(Date.now());
+ return '<div class="card"><h3>'+t("drTitle2")+'</h3><div class="muted">'+t("drNote")+'</div><div class="grid2"><label>'+t("drPhone")+'<input id="dr_p" dir="ltr" inputmode="tel" value="'+esc(S.settings.mgmtPhone||"")+'" placeholder="01XXXXXXXXX"></label><label>'+t("drHour")+'<input id="dr_h" type="number" min="0" max="23" value="'+(S.settings.drHour==null?22:S.settings.drHour)+'"></label></div><div class="row"><button class="btn pri" onclick="drSave()">'+t("save")+'</button><button class="btn" onclick="drSend(\''+td+'\')">'+t("drSendNow")+'</button><button class="btn" onclick="drCopy(\''+td+'\')">'+t("drCopy")+"</button></div></div>";
+}
+function drSave(){
+ if(!can("settings"))return;
+ const p=($("#dr_p").value||"").trim(),h=parseInt(norm($("#dr_h").value),10);
+ if(p&&!waNum(p)){toast(t("waNoPhone"));return}
+ if(!(h>=0&&h<=23)){toast(t("alBad"));return}
+ S.settings.mgmtPhone=p;S.settings.drHour=h;log("settings","daily report");save();toast(t("saved"));render();
+}
+{const _dc3=views.settingsBody;views.settingsBody=function(){_dc3();(window._hT||$("#view")).insertAdjacentHTML("beforeend",drCard()+devCard())}}
 
 /* ============ PIN hashing (salted, iterated SHA-256) ============ */
 const sha256=(()=>{
